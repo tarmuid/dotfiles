@@ -1,0 +1,29 @@
+[data]
+name = {{ promptStringOnce . "name" "Name for git commits" | quote }}
+email = {{ promptStringOnce . "email" "Email for git commits" | quote }}
+location = {{ promptChoiceOnce . "location" "Is this a home or work device" (list "home" "work") | quote }}
+
+[data.defaults]
+shell = "zsh"
+editor = "emacs"
+browser = "brave"
+player = "roon"
+notes-app = "org"
+
+[data.flags]
+ephemeral = false
+headless = false
+is_codespace = false
+
+[data.homebrew]
+prefix = "{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
+
+[data.profiles]
+gaming = {{ promptBoolOnce . "profiles.gaming" "Enable gaming features" false }}
+developer = {{ promptBoolOnce . "profiles.developer" "Enable developer features" true }}
+encoding = {{ promptBoolOnce . "profiles.encoding" "Enable encoding and production tools" false }}
+server = {{ promptBoolOnce . "profiles.server" "Enable server tools" false }}
+
+[diff]
+pager = {{ if lookPath "delta" }}"delta --paging=never"{{ else }}"less -FRX"{{ end }}
+{{ writeToStdout "Config file generated at " .chezmoi.configFile "\n" -}}

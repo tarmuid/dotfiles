@@ -1,0 +1,8 @@
+[packages.darwin]
+taps = [
+    "d12frosted/emacs-plus",
+    "homebrew-ffmpeg/ffmpeg",
+    "homebrew/bundle"
+]
+brews = []
+casks = []

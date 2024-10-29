@@ -1,0 +1,23 @@
+# OUTPUT FORBIDDEN
+# zshenv is always sourced, even for bg jobs
+
+# XDG base directories
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_DATA_HOME:-$HOME/.local/state}"
+
+# zsh specific directories
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+export ZSH_CACHE_DIR="$XDG_CACHE_HOME/zshcache"
+export ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump"
+
+# set locale if not already set
+export LANG="${LANG:-en_US.UTF-8}"
+
+export LESSHISTFILE="$XDG_STATE_HOME/less/history"
+
+# source zprofile if it exists
+if [[ -f "$ZDOTDIR/zprofile" ]]; then
+  source "$ZDOTDIR/.zprofile"
+fi
