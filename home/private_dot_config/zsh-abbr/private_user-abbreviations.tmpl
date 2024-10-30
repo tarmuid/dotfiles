@@ -1,0 +1,19 @@
+abbr -g cz="chezmoi"
+abbr -g dp="chezmoi apply -v --no-pager"
+
+{{ if lookPath "eza" -}}
+abbr -g l='eza --color=always --icons --group-directories-first --all --long --no-quotes'
+abbr -g ls='eza --color=always --icons --group-directories-first --no-quotes'
+abbr -g la='eza --color=always --icons --group-directories-first --all --no-quotes'
+abbr -g ll='eza --color=always --icons --group-directories-first --all --long --no-quotes'
+abbr -g le='eza --color=always --icons --group-directories-first --all --long --extended --no-quotes'
+{{- end }}
+
+{{ if eq .chezmoi.os "darwin" -}}
+abbr -g b="brew"
+abbr -g bi="brew install"
+abbr -g bu="brew uninstall"
+abbr -g br="brew reinstall"
+abbr -g ci="brew install --cask"
+abbr -g cu="brew uninstall --cask --zap"
+{{ end }}

@@ -6,6 +6,7 @@
 ;; use 'M-x doom/reload'.
 
 (package! chezmoi)
+(package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode"))
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;; (package! some-package)
