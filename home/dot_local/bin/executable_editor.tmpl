@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+{{ if eq .defaults.editor "emacs" -}}
+if ps -e | grep '[E]macs.app' > /dev/null; then
+    emacsclient -n "$@"
+else
+    open -a "Emacs" --args --chdir $PWD "$@"
+fi
+{{ else -}}
+{{ .defaults.editor }} "$@"
+{{ end }}
