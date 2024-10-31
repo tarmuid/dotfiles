@@ -1,0 +1,5 @@
+# Disable new user greeting.
+set fish_greeting
+{{ if lookPath "starship" -}}
+starship init fish | source
+{{ end }}

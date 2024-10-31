@@ -1,0 +1,72 @@
+abbr -a -- - 'cd -'
+abbr -a -- nv nvim
+abbr -a -- tarls 'tar -tvf'
+abbr -a -- untar 'tar -xv'
+abbr -a -- zz exit
+
+abbr -a -- cz chezmoi
+abbr -a -- dp 'chezmoi apply -v'
+abbr -a -- cdd 'cd {{ .chezmoi.sourceDir }}'
+
+abbr -a -- e {{ .defaults.editor }}
+
+abbr -a -- f fzf
+
+abbr -a -- gi 'gh issue'
+abbr -a -- gil 'gh issue list'
+abbr -a -- giv 'gh issue view'
+abbr -a -- gr 'gh pr'
+abbr -a -- grl 'gh pr list'
+abbr -a -- grv 'gh pr view'
+abbr -a -- grc 'gh pr checkout'
+abbr -a -- gb 'gh browse'
+
+{{ if eq .chezmoi.os "darwin" -}}
+abbr -a -- b brew
+abbr -a -- bi 'brew install'
+abbr -a -- bu 'brew uninstall'
+abbr -a -- bz 'brew uninstall --zap'
+abbr -a -- br 'brew reinstall'
+
+abbr -a -- ci 'brew install --cask'
+abbr -a -- brcz 'brew uninstall --cask --zap'
+{{ end -}}
+
+{{ if lookPath "eza" -}}
+alias ls 'eza --color=always --icons --group-directories-first'
+alias la 'eza --color=always --icons --group-directories-first --all'
+alias ll 'eza --color=always --icons --group-directories-first --all --long'
+alias le 'eza --color=always --icons --group-directories-first --all --long --extended'
+abbr -a -- l ll
+{{ end -}}
+
+{{ if eq .chezmoi.os "linux" -}}
+abbr -a -- s systemctl
+abbr -a -- su 'systemctl --user'
+abbr -a -- ss 'command systemctl status'
+abbr -a -- sl 'systemctl --type service --state running'
+abbr -a -- slu 'systemctl --user --type service --state running'
+abbr -a -- se 'sudo systemctl enable --now'
+abbr -a -- sd 'sudo systemctl disable --now'
+abbr -a -- sr 'sudo systemctl restart'
+abbr -a -- so 'sudo systemctl stop'
+abbr -a -- sa 'sudo systemctl start'
+abbr -a -- sf 'systemctl --failed --all'
+{{ end -}}
+
+{{ if lookPath "lazygit" }}
+abbr -a -- gg lazygit
+{{ end -}}
+
+{{ if lookPath "hub" -}}
+alias git hub
+abbr -a -- gl 'hub l --color | devmoji --log --color | less -rXF'
+abbr -a -- gs 'hub st'
+abbr -a -- gb 'hub checkout -b'
+abbr -a -- gc 'hub commit'
+abbr -a -- gpr 'hub pr checkout'
+abbr -a -- gm 'hub branch -l main | rg main > /dev/null 2>&1 && hub checkout main || hub checkout master'
+abbr -a -- gcp 'hub commit -p'
+abbr -a -- gpp 'hub push'
+abbr -a -- gp 'hub pull'
+{{ end }}
