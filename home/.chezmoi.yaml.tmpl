@@ -38,7 +38,9 @@ data:
     encoding: {{ $encoding }}
     server: {{ $server }}
 
+{{ if ne .chezmoi.os "windows" -}}
 diff:
   pager: {{ if lookPath "delta" }}"delta"{{ else }}"less -R"{{ end }}
+{{ end -}}
 
 encryption: age
