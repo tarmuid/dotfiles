@@ -8,4 +8,8 @@ export PATH
 
 {{ if stat (joinPath .homebrew.prefix "/bin/brew") -}}
 export PATH="{{ .homebrew.prefix }}/bin:{{ .homebrew.prefix }}/sbin:$PATH"
+{{ end -}}
+
+{{- if eq .auth_manager "1password" }}
+export SSH_AUTH_SOCK="$HOME/.local/state/1password/agent.sock"
 {{ end }}

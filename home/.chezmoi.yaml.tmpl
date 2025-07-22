@@ -3,6 +3,7 @@
 {{- $location := promptChoiceOnce . "location" "Location" (list "home" "work") "work" -}}
 {{- $editor := promptChoiceOnce . "editor" "Editor" (list "code" "nvim") "code" -}}
 {{- $shell := promptChoiceOnce . "shell" "Shell" (list "fish" "zsh" "pwsh") "fish" -}}
+{{- $authManager := promptChoiceOnce . "auth_manager" "Password manager" (list "1password" "proton-pass") "1password" -}}
 
 {{- $gaming := promptBoolOnce . "profiles.gaming" "Enable gaming features" false -}}
 {{- $encoding := promptBoolOnce . "profiles.encoding" "Include encoding and production tools and settings" false -}}
@@ -24,7 +25,7 @@ data:
   email: {{ $email | quote }}
   location: {{ $location | quote }}
   editor: {{ $editor | quote }}
-  auth_manager: "proton-pass"
+  auth_manager: {{ $authManager | quote }}
   shell: {{ $shell | quote }}
 
   flags:
