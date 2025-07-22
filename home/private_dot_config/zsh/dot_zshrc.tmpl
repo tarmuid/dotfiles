@@ -1,0 +1,11 @@
+# ============================================================================
+# Path
+# ============================================================================
+
+unset PATH
+PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH
+
+{{ if stat (joinPath .homebrew.prefix "/bin/brew") -}}
+export PATH="{{ .homebrew.prefix }}/bin:{{ .homebrew.prefix }}/sbin:$PATH"
+{{ end }}
