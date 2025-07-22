@@ -6,8 +6,10 @@ signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICL5VdV7CMIyv03GZT0klG+syvc25qV
 [commit]
 gpgsign = true
 
+{{ if lookPath "delta" -}}
 [core]
 pager = delta
+{{- end }}
 
 [gpg]
 format = ssh
