@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+{{ if eq .shell "fish" -}}
+if ! grep -q "{{ .homebrew.prefix }}/bin/fish" /etc/shells; then
+  echo "{{ .homebrew.prefix }}/bin/fish" | sudo tee -a /etc/shells
+  chsh -s "{{ .homebrew.prefix }}/bin/fish"
+fi
+{{ end }}
