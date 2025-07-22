@@ -15,6 +15,10 @@
 {{-   $ephemeral = true -}}
 {{-   $headless = true -}}
 {{- end -}}
+age:
+  identity: "~/.config/chezmoi/key.txt"
+  recipient: "age18px92ej82yngu3src7ehe834thrkq7aes5mhqwwdd055qmlncu4qzlys6y"
+  
 data:
   name: {{ $name | quote }}
   email: {{ $email | quote }}
@@ -36,3 +40,5 @@ data:
 
 diff:
   pager: {{ if lookPath "delta" }}"delta"{{ else }}"less -R"{{ end }}
+
+encryption: age
