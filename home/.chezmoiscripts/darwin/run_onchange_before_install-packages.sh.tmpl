@@ -17,6 +17,9 @@ cask {{ . | quote }}
 {{  range .packages.darwin.media.taps -}}
 tap {{ . | quote }}
 {{  end -}}
+{{  range .packages.darwin.media.brews -}}
+brews {{ . | quote }}
+{{  end -}}
 {{  range .packages.darwin.media.casks -}}
 cask {{ . | quote }}
 {{  end -}}

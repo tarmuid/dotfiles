@@ -25,20 +25,21 @@ packages:
       - 'xh'
       - 'xz'
       - 'yazi'
-      - 'yt-dlp'
       - 'zoxide'
     extras:
     casks:
-      - 'brave-browser'
+      - '1password'
       - 'ghostty'
       - 'obsidian'
-      - 'proton-pass'
       - 'raycast'
       - 'remnote'
       - 'visual-studio-code'
+      - 'vivaldi'
     media:
       taps:
         - 'homebrew-ffmpeg/ffmpeg'
+      brews:
+        - 'yt-dlp'
       casks:
         - 'plex-media-server'
         - 'calibre'
