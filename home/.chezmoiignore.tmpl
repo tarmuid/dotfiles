@@ -16,4 +16,11 @@ Library
 
 {{ if eq .chezmoi.os "windows" }}
 .hushlogin
+.zshenv
+.config/fish
+.config/zsh
+{{ end }}
+
+{{ if ne .chezmoi.os "windows" }}
+AppData
 {{ end }}
