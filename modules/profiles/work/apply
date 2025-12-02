@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+
+set -eu
+
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+GIT_LOCAL="$XDG_CONFIG_HOME/git/config.local"
+
+name="${DOT_WORK_GIT_NAME:-${GIT_NAME:-}}"
+email="${DOT_WORK_GIT_EMAIL:-${GIT_EMAIL:-}}"
+signing_key="${DOT_WORK_GIT_SIGNING_KEY:-${GIT_SIGNING_KEY:-}}"
+
+[ -n "$name" ] || { echo "dot: DOT_WORK_GIT_NAME (or GIT_NAME) not set" >&2; exit 1; }
+[ -n "$email" ] || { echo "dot: DOT_WORK_GIT_EMAIL (or GIT_EMAIL) not set" >&2; exit 1; }
+
+mkdir -p "$(dirname "$GIT_LOCAL")"
+
+{
+  printf "[user]\n"
+  printf "name = %s\n" "$name"
+  printf "email = %s\n" "$email"
+  if [ -n "$signing_key" ]; then
+    printf "signingKey = %s\n" "$signing_key"
+  fi
+} > "$GIT_LOCAL"
+
+echo "dot: wrote work git identity to $GIT_LOCAL"
