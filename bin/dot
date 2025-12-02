@@ -1,0 +1,367 @@
+#!/usr/bin/env sh
+
+set -eu
+
+DOT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+MODULES_DIR="$DOT_ROOT/modules"
+PROFILES_FILE="$DOT_ROOT/profiles.yml"
+DEFAULT_XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"$HOME/.config"}"
+FORCE=0
+
+log() {
+  printf "dot: %s\n" "$*" >&2
+}
+
+fail() {
+  log "$*"
+  exit 1
+}
+
+usage() {
+  cat <<'EOF'
+dot - minimal module manager for these dotfiles
+
+Usage:
+  dot apply [--force] [--profile <name>] [module ...]
+  dot disable [--profile <name>] [module ...]
+  dot list profiles|modules
+  dot help
+
+apply      Enable modules (runs module apply script or links files). --force replaces existing files.
+disable    Disable modules (runs module disable script or unlinks files).
+list       Show profiles from profiles.yml or module directories.
+
+If no modules are provided to apply/disable, the default profile is used.
+EOF
+}
+
+profile_modules() {
+  profile="$1"
+
+  [ -f "$PROFILES_FILE" ] || fail "profiles file not found: $PROFILES_FILE"
+
+  modules=$(
+    awk -v profile="$profile" '
+      BEGIN { in_target=0; in_modules=0 }
+      /^[[:space:]]*#/ { next }
+      /^profiles:/ { in_profiles=1; next }
+      in_profiles && $0 ~ /^  [^[:space:]]/ {
+        line=$0
+        sub(/^  /,"",line)
+        sub(/:.*/,"",line)
+        current=line
+        in_target = (current == profile)
+        in_modules = 0
+        next
+      }
+      in_target && /^    modules:[[:space:]]*$/ { in_modules=1; next }
+      in_target && in_modules && $0 ~ /^[[:space:]]*-/ {
+        line=$0
+        sub(/^[[:space:]]*-[[:space:]]*/, "", line)
+        print line
+        next
+      }
+      in_target && $0 ~ /^  [^[:space:]]/ { exit 0 }
+      END { if (in_target == 0) exit 2 }
+    ' "$PROFILES_FILE"
+  )
+
+  status=$?
+  [ $status -eq 0 ] || fail "profile not found: $profile"
+  [ -n "$modules" ] || fail "profile '$profile' has no modules"
+
+  printf "%s\n" "$modules"
+}
+
+maybe_default_profile() {
+  if [ -f "$PROFILES_FILE" ]; then
+    if awk '/^profiles:/{found=1} found && /^[[:space:]]{2}default:/{exit 0} END{exit 1}' "$PROFILES_FILE"; then
+      profile_modules "default"
+      return 0
+    fi
+  fi
+  fail "no modules specified and no default profile found"
+}
+
+manifest_path() {
+  module_dir="$1"
+  if [ -f "$module_dir/_links" ]; then
+    printf "%s\n" "$module_dir/_links"
+    return 0
+  fi
+  if [ -f "$module_dir/links" ]; then
+    printf "%s\n" "$module_dir/links"
+    return 0
+  fi
+  return 1
+}
+
+link_module_tree() {
+  module="$1"
+  module_dir="$MODULES_DIR/$module"
+  home_dir="$module_dir/home"
+
+  [ -d "$home_dir" ] || {
+    log "no home/ directory for $module; nothing to link"
+    return 0
+  }
+
+  log "linking files for $module"
+
+  find "$home_dir" -mindepth 1 \( -type f -o -type l \) | while IFS= read -r src; do
+    rel=${src#$home_dir/}
+    dest="$HOME/$rel"
+    dest_dir=$(dirname "$dest")
+    [ -d "$dest_dir" ] || mkdir -p "$dest_dir"
+
+    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
+      continue
+    fi
+
+    if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+      if [ "$FORCE" -eq 1 ]; then
+        log "replacing existing path with link: $dest"
+        rm -rf "$dest"
+      else
+        log "skip existing path (not a symlink): $dest (use --force to replace)"
+        continue
+      fi
+    fi
+
+    [ -L "$dest" ] && rm "$dest"
+    ln -s "$src" "$dest"
+  done
+}
+
+unlink_module_tree() {
+  module="$1"
+  module_dir="$MODULES_DIR/$module"
+  home_dir="$module_dir/home"
+
+  [ -d "$home_dir" ] || return 0
+
+  log "removing links for $module"
+
+  find "$home_dir" -mindepth 1 \( -type f -o -type l \) | while IFS= read -r src; do
+    rel=${src#$home_dir/}
+    dest="$HOME/$rel"
+
+    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
+      rm "$dest"
+    fi
+  done
+}
+
+resolve_dest_path() {
+  dest="$1"
+  case "$dest" in
+    /*) printf "%s\n" "$dest" ;;
+    "~"/*) printf "%s\n" "$HOME/${dest#~/}" ;;
+    "\$HOME"/*) printf "%s\n" "$HOME/${dest#\$HOME/}" ;;
+    "\$XDG_CONFIG_HOME"/*) printf "%s\n" "$DEFAULT_XDG_CONFIG_HOME/${dest#\$XDG_CONFIG_HOME/}" ;;
+    *) printf "%s\n" "$HOME/$dest" ;;
+  esac
+}
+
+link_manifest() {
+  module="$1"
+  module_dir="$MODULES_DIR/$module"
+  manifest="$(manifest_path "$module_dir")" || return 1
+
+  log "linking files for $module (links manifest)"
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    # trim leading/trailing whitespace and skip blanks/comments
+    line=$(printf "%s" "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    case "$line" in
+      ""|"#"*) continue ;;
+    esac
+
+    set -- $line
+    [ $# -ge 2 ] || { log "skip malformed line in $manifest: $line"; continue; }
+
+    src_rel="$1"
+    dest_tpl="$2"
+    src="$module_dir/$src_rel"
+    [ -e "$src" ] || { log "source not found in $module: $src_rel"; continue; }
+
+    dest=$(resolve_dest_path "$dest_tpl")
+    dest_dir=$(dirname "$dest")
+    [ -d "$dest_dir" ] || mkdir -p "$dest_dir"
+
+    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
+      continue
+    fi
+
+    if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+      if [ "$FORCE" -eq 1 ]; then
+        log "replacing existing path with link: $dest"
+        rm -rf "$dest"
+      else
+        log "skip existing path (not a symlink): $dest (use --force to replace)"
+        continue
+      fi
+    fi
+
+    [ -L "$dest" ] && rm "$dest"
+    ln -s "$src" "$dest"
+  done < "$manifest"
+
+  return 0
+}
+
+unlink_manifest() {
+  module="$1"
+  module_dir="$MODULES_DIR/$module"
+  manifest="$(manifest_path "$module_dir")" || return 1
+
+  log "removing links for $module (links manifest)"
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=$(printf "%s" "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    case "$line" in
+      ""|"#"*) continue ;;
+    esac
+
+    set -- $line
+    [ $# -ge 2 ] || continue
+
+    dest_tpl="$2"
+    dest=$(resolve_dest_path "$dest_tpl")
+
+    if [ -L "$dest" ]; then
+      rm "$dest"
+    fi
+  done < "$manifest"
+
+  return 0
+}
+
+run_apply() {
+  module="$1"
+  module_dir="$MODULES_DIR/$module"
+
+  [ -d "$module_dir" ] || fail "module not found: $module"
+
+  if [ -x "$module_dir/apply" ]; then
+    log "applying $module (script)"
+    (cd "$module_dir" && DOT_ROOT="$DOT_ROOT" sh ./apply)
+    return
+  fi
+
+  if ! link_manifest "$module"; then
+    link_module_tree "$module"
+  fi
+}
+
+run_disable() {
+  module="$1"
+  module_dir="$MODULES_DIR/$module"
+
+  [ -d "$module_dir" ] || fail "module not found: $module"
+
+  if [ -x "$module_dir/disable" ]; then
+    log "disabling $module (script)"
+    (cd "$module_dir" && DOT_ROOT="$DOT_ROOT" sh ./disable)
+    return
+  fi
+
+  if ! unlink_manifest "$module"; then
+    unlink_module_tree "$module"
+  fi
+}
+
+list_profiles() {
+  [ -f "$PROFILES_FILE" ] || fail "profiles file not found: $PROFILES_FILE"
+  awk '
+    /^profiles:/ {in_profiles=1; next}
+    in_profiles && $0 ~ /^  [^[:space:]]/ {
+      line=$0
+      sub(/^  /,"",line)
+      sub(/:.*/,"",line)
+      print line
+    }
+  ' "$PROFILES_FILE"
+}
+
+list_modules() {
+  [ -d "$MODULES_DIR" ] || fail "modules directory not found: $MODULES_DIR"
+  find "$MODULES_DIR" -mindepth 2 -maxdepth 2 -type d | while IFS= read -r dir; do
+    rel=${dir#$MODULES_DIR/}
+    printf "%s\n" "$rel"
+  done
+}
+
+handle_apply_or_disable() {
+  action="$1"
+  shift
+
+  FORCE=0
+  profile=""
+  modules=""
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --force)
+        FORCE=1
+        shift
+        ;;
+      --profile|-p)
+        [ $# -ge 2 ] || fail "--profile requires a value"
+        profile="$2"
+        shift 2
+        ;;
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      --)
+        shift
+        break
+        ;;
+      *)
+        modules="$modules $1"
+        shift
+        ;;
+    esac
+  done
+
+  # shellcheck disable=SC2086
+  set -- $modules
+
+  if [ -n "$profile" ]; then
+    set -- $(profile_modules "$profile")
+  elif [ $# -eq 0 ]; then
+    set -- $(maybe_default_profile)
+  fi
+
+  [ $# -gt 0 ] || fail "no modules to process"
+
+  for module in "$@"; do
+    case "$action" in
+      apply) run_apply "$module" ;;
+      disable) run_disable "$module" ;;
+    esac
+  done
+}
+
+main() {
+  command="${1:-help}"
+  shift || true
+
+  case "$command" in
+    apply) handle_apply_or_disable apply "$@" ;;
+    disable) handle_apply_or_disable disable "$@" ;;
+    list)
+      case "${1:-}" in
+        profiles) list_profiles ;;
+        modules) list_modules ;;
+        *) usage ;;
+      esac
+      ;;
+    help|-h|--help) usage ;;
+    *) fail "unknown command: $command" ;;
+  esac
+}
+
+main "$@"

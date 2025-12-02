@@ -1,0 +1,19 @@
+[user]
+name = tarmuid
+email = tarmuid@pm.me
+signingKey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDXuQPyN8tLZ93Z0S50uyH9XYEJfwu99+N2Y25selqnG
+
+[commit]
+gpgsign = true
+
+[gpg]
+format = ssh
+
+[gpg.ssh]
+allowedSignersFile = "$HOME/.ssh/allowed_signers"
+
+[init]
+defaultBranch = master
+
+[tag]
+gpgsign = true

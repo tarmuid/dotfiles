@@ -1,0 +1,2 @@
+allowed_signers   $HOME/.ssh/allowed_signers
+config            $HOME/.ssh/config

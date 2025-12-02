@@ -1,0 +1,9 @@
+profiles:
+  default:
+    modules:
+      - shell/zsh
+      - tools/git
+      - tools/ssh
+  mac:
+    modules:
+      - profiles/macOS

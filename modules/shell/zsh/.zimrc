@@ -1,0 +1,8 @@
+zmodule zsh-users/zsh-syntax-highlighting
+zmodule zsh-users/zsh-autosuggestions
+zmodule ssh
+zmodule olets/zsh-abbr
+zmodule duration-info
+zmodule git-info
+zmodule asciiship
+zmodule completion

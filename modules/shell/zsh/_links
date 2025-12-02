@@ -1,0 +1,3 @@
+.zshenv  $HOME/.zshenv
+.zshrc   $XDG_CONFIG_HOME/zsh/.zshrc
+.zimrc   $XDG_CONFIG_HOME/zsh/.zimrc
