@@ -1,0 +1,3 @@
+config.fish   $XDG_CONFIG_HOME/fish/config.fish
+conf.d        $XDG_CONFIG_HOME/fish/conf.d/
+functions     $XDG_CONFIG_HOME/fish/functions/

@@ -163,6 +163,27 @@ resolve_dest_path() {
   esac
 }
 
+manifest_dest_path() {
+  src_rel="$1"
+  dest_tpl="$2"
+  dest=$(resolve_dest_path "$dest_tpl")
+
+  case "$dest_tpl" in
+    */)
+      dest_no_slash=${dest%/}
+      dest_base=$(basename "$dest_no_slash")
+      src_base=$(basename "$src_rel")
+      if [ "$dest_base" = "$src_base" ]; then
+        dest="$dest_no_slash"
+      else
+        dest="$dest_no_slash/$src_base"
+      fi
+      ;;
+  esac
+
+  printf "%s\n" "$dest"
+}
+
 link_manifest() {
   module="$1"
   module_dir="$MODULES_DIR/$module"
@@ -185,7 +206,7 @@ link_manifest() {
     src="$module_dir/$src_rel"
     [ -e "$src" ] || { log "source not found in $module: $src_rel"; continue; }
 
-    dest=$(resolve_dest_path "$dest_tpl")
+    dest=$(manifest_dest_path "$src_rel" "$dest_tpl")
     dest_dir=$(dirname "$dest")
     [ -d "$dest_dir" ] || mkdir -p "$dest_dir"
 
@@ -227,7 +248,7 @@ unlink_manifest() {
     [ $# -ge 2 ] || continue
 
     dest_tpl="$2"
-    dest=$(resolve_dest_path "$dest_tpl")
+    dest=$(manifest_dest_path "$1" "$dest_tpl")
 
     if [ -L "$dest" ]; then
       rm "$dest"
