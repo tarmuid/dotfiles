@@ -1,0 +1,186 @@
+#!/usr/bin/env sh
+
+set -eu
+
+DEFAULT_DIR="${DOTFILES_DIR:-$HOME/.local/share/dotfiles}"
+DEFAULT_REPO="${DOTFILES_REPO:-https://github.com/tarmuid/dotfiles.git}"
+DEFAULT_BRANCH="${DOTFILES_BRANCH:-master}"
+
+log() {
+  printf "bootstrap: %s\n" "$*" >&2
+}
+
+die() {
+  log "$*"
+  exit 1
+}
+
+usage() {
+  cat <<'EOF'
+bootstrap - fetch and apply these dotfiles
+
+Usage:
+  bootstrap [options]
+
+Options:
+  -d, --dir <path>        Target checkout directory (default: $HOME/.local/share/dotfiles)
+  --repo <url>            Git URL to clone from (default: https://github.com/tarmuid/dotfiles.git)
+  --branch <name>         Git branch to checkout (default: main)
+  --no-pull               Skip git pull when repo already exists
+  --no-apply              Do not run bin/dot apply after checkout
+  -p, --profile <name>    Apply the given profile (e.g., work)
+  --modules "<list>"      Apply specific modules (space-separated)
+  --force                 Pass --force through to bin/dot apply
+  --run "<cmd>"           Extra command to run in the repo (can be repeated)
+  -h, --help              Show this message
+
+Environment overrides: DOTFILES_DIR, DOTFILES_REPO, DOTFILES_BRANCH
+EOF
+}
+
+ensure_git() {
+  command -v git >/dev/null 2>&1 || die "git is required"
+}
+
+clone_or_update_repo() {
+  dir="$1"
+  repo="$2"
+  branch="$3"
+  do_pull="$4"
+
+  if [ -d "$dir/.git" ]; then
+    log "using existing repo at $dir"
+    if [ "$do_pull" = "1" ]; then
+      log "updating repo (branch: $branch)"
+      git -C "$dir" fetch --depth 1 origin "$branch" || git -C "$dir" fetch --all
+      git -C "$dir" checkout "$branch"
+      git -C "$dir" pull --ff-only origin "$branch" || true
+    fi
+    return
+  fi
+
+  if [ -e "$dir" ] && [ -n "$(ls -A "$dir" 2>/dev/null)" ]; then
+    die "target directory exists and is not empty: $dir"
+  fi
+
+  log "cloning $repo (branch: $branch) into $dir"
+  git clone --depth 1 --branch "$branch" "$repo" "$dir"
+}
+
+apply_dotfiles() {
+  dir="$1"
+  profile="$2"
+  modules="$3"
+  force="$4"
+
+  dot_cmd="$dir/bin/dot"
+  [ -x "$dot_cmd" ] || die "dot command not found at $dot_cmd"
+
+  set -- apply
+  [ "$force" = "1" ] && set -- "$@" --force
+  [ -n "$profile" ] && set -- "$@" --profile "$profile"
+  [ -n "$modules" ] && set -- "$@" $modules
+
+  "$dot_cmd" "$@"
+}
+
+run_extra_commands() {
+  dir="$1"
+  cmds="$2"
+
+  [ -n "$cmds" ] || return 0
+
+  printf "%s\n" "$cmds" | while IFS= read -r cmd; do
+    [ -n "$cmd" ] || continue
+    log "running: $cmd"
+    (cd "$dir" && sh -c "$cmd")
+  done
+}
+
+main() {
+  dir="$DEFAULT_DIR"
+  repo="$DEFAULT_REPO"
+  branch="$DEFAULT_BRANCH"
+  do_pull=1
+  do_apply=1
+  profile=""
+  modules=""
+  force=0
+  extra_cmds=""
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -d|--dir)
+        [ $# -ge 2 ] || die "$1 requires a value"
+        dir="$2"
+        shift 2
+        ;;
+      --repo)
+        [ $# -ge 2 ] || die "$1 requires a value"
+        repo="$2"
+        shift 2
+        ;;
+      --branch)
+        [ $# -ge 2 ] || die "$1 requires a value"
+        branch="$2"
+        shift 2
+        ;;
+      --no-pull)
+        do_pull=0
+        shift
+        ;;
+      --no-apply)
+        do_apply=0
+        shift
+        ;;
+      -p|--profile)
+        [ $# -ge 2 ] || die "$1 requires a value"
+        profile="$2"
+        shift 2
+        ;;
+      --modules)
+        [ $# -ge 2 ] || die "$1 requires a value"
+        modules="$modules $2"
+        shift 2
+        ;;
+      --force)
+        force=1
+        shift
+        ;;
+      --run)
+        [ $# -ge 2 ] || die "$1 requires a value"
+        extra_cmds="${extra_cmds}
+$2"
+        shift 2
+        ;;
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      --)
+        shift
+        break
+        ;;
+      *)
+        die "unknown option: $1"
+        ;;
+    esac
+  done
+
+  ensure_git
+  [ -n "$repo" ] || die "repository URL is required (set --repo or DOTFILES_REPO)"
+
+  clone_or_update_repo "$dir" "$repo" "$branch" "$do_pull"
+
+  if [ "$do_apply" = "1" ]; then
+    apply_dotfiles "$dir" "$profile" "$modules" "$force"
+  else
+    log "skipping apply (per --no-apply)"
+  fi
+
+  run_extra_commands "$dir" "$extra_cmds"
+
+  log "done"
+}
+
+main "$@"
