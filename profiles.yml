@@ -7,3 +7,9 @@ profiles:
   mac:
     modules:
       - profiles/macOS
+  server:
+    modules:
+      - profiles/beets
+  work:
+    modules:
+      - profiles/work

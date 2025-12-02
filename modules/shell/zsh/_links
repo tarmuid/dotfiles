@@ -1,3 +1,4 @@
-.zshenv   $HOME/.zshenv
-.zshrc    $XDG_CONFIG_HOME/zsh/.zshrc
-.zimrc    $XDG_CONFIG_HOME/zsh/.zimrc
+.zshenv    $HOME/.zshenv
+.zshrc     $XDG_CONFIG_HOME/zsh/.zshrc
+.zimrc     $XDG_CONFIG_HOME/zsh/.zimrc
+zsh-abbr   $XDG_CONFIG_HOME/zsh-abbr/

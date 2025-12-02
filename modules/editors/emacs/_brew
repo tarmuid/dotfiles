@@ -1,0 +1,2 @@
+tap "jimeh/emacs-builds"
+cask "emacs-app-good"

@@ -33,6 +33,7 @@ export PATH
 # 3. Homebrew
 # ------------------------------------------------------------------------------
 eval "$(/opt/homebrew/bin/brew shellenv)"
+export HOMEBREW_BUNDLE_FILE="$XDG_CONFIG_HOME/brew/Brewfile"
 
 # ------------------------------------------------------------------------------
 # 4. Default programs
