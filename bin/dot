@@ -29,7 +29,7 @@ usage() {
 dot - minimal module manager for these dotfiles
 
 Usage:
-  dot apply [--force] [--profile <name>] [module ...]
+  dot apply [--force] [--profile <name>] [module{/*} ...]
   dot disable [--profile <name>] [module ...]
   dot list active|inactive
   dot help
@@ -49,7 +49,7 @@ profile_modules() {
 
   modules=$(
     awk -v profile="$profile" '
-      BEGIN { in_target=0; in_modules=0 }
+      BEGIN { in_target=0; in_modules=0; found=0 }
       /^[[:space:]]*#/ { next }
       /^profiles:/ { in_profiles=1; next }
       in_profiles && $0 ~ /^  [^[:space:]]/ {
@@ -58,6 +58,7 @@ profile_modules() {
         sub(/:.*/,"",line)
         current=line
         in_target = (current == profile)
+        found = found || in_target
         in_modules = 0
         next
       }
@@ -68,8 +69,7 @@ profile_modules() {
         print line
         next
       }
-      in_target && $0 ~ /^  [^[:space:]]/ { exit 0 }
-      END { if (in_target == 0) exit 2 }
+      END { if (found == 0) exit 2 }
     ' "$PROFILES_FILE"
   )
 
@@ -114,62 +114,6 @@ brew_manifest_path() {
     return 0
   fi
   return 1
-}
-
-link_module_tree() {
-  module="$1"
-  module_dir="$MODULES_DIR/$module"
-  home_dir="$module_dir/home"
-
-  [ -d "$home_dir" ] || {
-    log "no \$HOME directory for $module; nothing to link"
-    return 0
-  }
-
-  log "linking files for $module"
-
-  find "$home_dir" -mindepth 1 \( -type f -o -type l \) | while IFS= read -r src; do
-    rel=${src#$home_dir/}
-    dest="$HOME/$rel"
-    dest_dir=$(dirname "$dest")
-    [ -d "$dest_dir" ] || mkdir -p "$dest_dir"
-
-    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
-      continue
-    fi
-
-    if [ -e "$dest" ] && [ ! -L "$dest" ]; then
-      if [ "$FORCE" -eq 1 ]; then
-        log "replacing existing path with link: $dest"
-        rm -rf "$dest"
-      else
-        log "skip existing path (not a symlink): $dest (use --force to replace)"
-        continue
-      fi
-    fi
-
-    [ -L "$dest" ] && rm "$dest"
-    ln -s "$src" "$dest"
-  done
-}
-
-unlink_module_tree() {
-  module="$1"
-  module_dir="$MODULES_DIR/$module"
-  home_dir="$module_dir/home"
-
-  [ -d "$home_dir" ] || return 0
-
-  log "removing links for $module"
-
-  find "$home_dir" -mindepth 1 \( -type f -o -type l \) | while IFS= read -r src; do
-    rel=${src#$home_dir/}
-    dest="$HOME/$rel"
-
-    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
-      rm "$dest"
-    fi
-  done
 }
 
 resolve_dest_path() {
@@ -427,12 +371,15 @@ run_apply() {
 
   [ -d "$module_dir" ] || fail "module not found: $module"
 
+  applied=0
   if [ -x "$module_dir/apply" ]; then
     log "applying $module (script)"
     (cd "$module_dir" && DOT_ROOT="$DOT_ROOT" sh ./apply)
-  elif ! link_manifest "$module"; then
-    link_module_tree "$module"
+    applied=1
+  elif link_manifest "$module"; then
+    applied=1
   fi
+  [ "$applied" -eq 1 ] || log "no apply script or links manifest for $module; nothing to link"
 
   record_brew_manifest "$module"
   mark_module_active "$module"
@@ -444,12 +391,15 @@ run_disable() {
 
   [ -d "$module_dir" ] || fail "module not found: $module"
 
+  disabled=0
   if [ -x "$module_dir/disable" ]; then
     log "disabling $module (script)"
     (cd "$module_dir" && DOT_ROOT="$DOT_ROOT" sh ./disable)
-  elif ! unlink_manifest "$module"; then
-    unlink_module_tree "$module"
+    disabled=1
+  elif unlink_manifest "$module"; then
+    disabled=1
   fi
+  [ "$disabled" -eq 1 ] || log "no disable script or links manifest for $module; nothing to unlink"
 
   remove_brew_manifest "$module"
   unmark_module_active "$module"
@@ -474,6 +424,51 @@ list_modules() {
     rel=${dir#$MODULES_DIR/}
     printf "%s\n" "$rel"
   done | sort
+}
+
+normalize_module_pattern() {
+  pattern="$1"
+  pattern=${pattern#./}
+  pattern=${pattern#modules/}
+  pattern=${pattern#./modules/}
+  case "$pattern" in "$MODULES_DIR"/*) pattern=${pattern#"$MODULES_DIR"/} ;; esac
+  pattern=${pattern%/}
+  printf "%s\n" "$pattern"
+}
+
+expand_module_args() {
+  all_modules=$(list_modules)
+  expanded=""
+
+  for raw in "$@"; do
+    pattern=$(normalize_module_pattern "$raw")
+
+    case "$pattern" in
+      *"*"*|*"?"*|*"["*)
+        ;;
+      */*)
+        ;;
+      *)
+        if [ -d "$MODULES_DIR/$pattern" ]; then
+          pattern="$pattern/*"
+        fi
+        ;;
+    esac
+
+    matches=""
+    while IFS= read -r module; do
+      case "$module" in
+        $pattern) matches="$matches $module" ;;
+      esac
+    done <<EOF
+$all_modules
+EOF
+
+    [ -n "$matches" ] || fail "no modules matched: $raw"
+    expanded="$expanded$matches"
+  done
+
+  printf "%s\n" "$expanded" | tr ' ' '\n' | awk 'NF && !seen[$0]++'
 }
 
 handle_apply_or_disable() {
@@ -521,6 +516,8 @@ handle_apply_or_disable() {
   fi
 
   [ $# -gt 0 ] || fail "no modules to process"
+
+  set -- $(expand_module_args "$@")
 
   for module in "$@"; do
     case "$action" in

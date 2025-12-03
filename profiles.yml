@@ -1,12 +1,23 @@
 profiles:
   default:
     modules:
+      - editors/helix
       - shell/zsh
+      - tools/fzf
       - tools/git
+      - tools/gh
+      - tools/lazygit
+      - tools/mise
+      - tools/rg
       - tools/ssh
+      - tools/tldr
+  home:
+    modules:
+      - apps/signal
   mac:
     modules:
       - profiles/macOS
+      - terminals/iterm2
   server:
     modules:
       - profiles/beets
