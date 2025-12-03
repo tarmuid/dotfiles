@@ -42,6 +42,17 @@ ensure_git() {
   command -v git >/dev/null 2>&1 || die "git is required"
 }
 
+ensure_xdg_dirs() {
+  XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+  XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+  XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+  XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+  for dir in "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_STATE_HOME/zsh" "$XDG_CACHE_HOME" "$XDG_CACHE_HOME/zsh"; do
+    [ -d "$dir" ] || mkdir -p "$dir"
+  done
+}
+
 clone_or_update_repo() {
   dir="$1"
   repo="$2"
@@ -168,6 +179,7 @@ $2"
   done
 
   ensure_git
+  ensure_xdg_dirs
   [ -n "$repo" ] || die "repository URL is required (set --repo or DOTFILES_REPO)"
 
   clone_or_update_repo "$dir" "$repo" "$branch" "$do_pull"
