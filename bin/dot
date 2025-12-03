@@ -6,9 +6,12 @@ DOT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MODULES_DIR="$DOT_ROOT/modules"
 PROFILES_FILE="$DOT_ROOT/profiles.yml"
 DEFAULT_XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"$HOME/.config"}"
+DEFAULT_XDG_STATE_HOME="${XDG_STATE_HOME:-"$HOME/.local/state"}"
 BREW_CONFIG_DIR="$DEFAULT_XDG_CONFIG_HOME/brew"
 BREW_MODULES_DIR="$BREW_CONFIG_DIR/modules"
 BREWFILE_PATH="$BREW_CONFIG_DIR/Brewfile"
+DOT_STATE_DIR="$DEFAULT_XDG_STATE_HOME/dot"
+ACTIVE_MODULES_FILE="$DOT_STATE_DIR/active-modules"
 BREWFILE_UPDATE_NEEDED=0
 FORCE=0
 
@@ -28,14 +31,14 @@ dot - minimal module manager for these dotfiles
 Usage:
   dot apply [--force] [--profile <name>] [module ...]
   dot disable [--profile <name>] [module ...]
-  dot list profiles|modules
+  dot list active|inactive
   dot help
 
 apply      Enable modules (runs module apply script or links files). --force replaces existing files.
 disable    Disable modules (runs module disable script or unlinks files).
-list       Show profiles from profiles.yml or module directories.
+list       Show tracked active modules, or inactive modules from the modules directory.
 
-If no modules are provided to apply/disable, the default profile is used.
+If no modules are provided to apply/disable, the default profile from profiles.yml is used.
 EOF
 }
 
@@ -368,6 +371,56 @@ rebuild_brewfile() {
   BREWFILE_UPDATE_NEEDED=0
 }
 
+ensure_state_dir() {
+  [ -d "$DOT_STATE_DIR" ] || mkdir -p "$DOT_STATE_DIR"
+}
+
+mark_module_active() {
+  module="$1"
+
+  ensure_state_dir
+  tmp="$(mktemp "$DOT_STATE_DIR/active-modules.XXXXXX")"
+  {
+    [ -f "$ACTIVE_MODULES_FILE" ] && cat "$ACTIVE_MODULES_FILE"
+    printf "%s\n" "$module"
+  } | sort -u > "$tmp"
+  mv "$tmp" "$ACTIVE_MODULES_FILE"
+}
+
+unmark_module_active() {
+  module="$1"
+
+  [ -f "$ACTIVE_MODULES_FILE" ] || return 0
+
+  ensure_state_dir
+  tmp="$(mktemp "$DOT_STATE_DIR/active-modules.XXXXXX")"
+  grep -Fxv "$module" "$ACTIVE_MODULES_FILE" > "$tmp" || true
+
+  if [ -s "$tmp" ]; then
+    mv "$tmp" "$ACTIVE_MODULES_FILE"
+  else
+    rm -f "$tmp" "$ACTIVE_MODULES_FILE"
+  fi
+}
+
+list_active_modules() {
+  if [ -f "$ACTIVE_MODULES_FILE" ]; then
+    cat "$ACTIVE_MODULES_FILE"
+  else
+    log "no active modules recorded"
+  fi
+}
+
+list_inactive_modules() {
+  active_file="$ACTIVE_MODULES_FILE"
+  list_modules | while IFS= read -r module; do
+    if [ -f "$active_file" ] && grep -Fxq "$module" "$active_file"; then
+      continue
+    fi
+    printf "%s\n" "$module"
+  done
+}
+
 run_apply() {
   module="$1"
   module_dir="$MODULES_DIR/$module"
@@ -382,6 +435,7 @@ run_apply() {
   fi
 
   record_brew_manifest "$module"
+  mark_module_active "$module"
 }
 
 run_disable() {
@@ -398,6 +452,7 @@ run_disable() {
   fi
 
   remove_brew_manifest "$module"
+  unmark_module_active "$module"
 }
 
 list_profiles() {
@@ -418,7 +473,7 @@ list_modules() {
   find "$MODULES_DIR" -mindepth 2 -maxdepth 2 -type d | while IFS= read -r dir; do
     rel=${dir#$MODULES_DIR/}
     printf "%s\n" "$rel"
-  done
+  done | sort
 }
 
 handle_apply_or_disable() {
@@ -486,8 +541,8 @@ main() {
     disable) handle_apply_or_disable disable "$@" ;;
     list)
       case "${1:-}" in
-        profiles) list_profiles ;;
-        modules) list_modules ;;
+        active) list_active_modules ;;
+        inactive) list_inactive_modules ;;
         *) usage ;;
       esac
       ;;

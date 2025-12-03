@@ -5,6 +5,8 @@ set -eu
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 GIT_LOCAL="$XDG_CONFIG_HOME/git/config.local"
 
+repo_root="${DOT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || cd "$(dirname "$0")/../../.." && pwd)}"
+
 name="${DOT_WORK_GIT_NAME:-${GIT_NAME:-}}"
 email="${DOT_WORK_GIT_EMAIL:-${GIT_EMAIL:-}}"
 signing_key="${DOT_WORK_GIT_SIGNING_KEY:-${GIT_SIGNING_KEY:-}}"
@@ -22,5 +24,96 @@ mkdir -p "$(dirname "$GIT_LOCAL")"
     printf "signingKey = %s\n" "$signing_key"
   fi
 } > "$GIT_LOCAL"
+
+age_command() {
+  if command -v rage >/dev/null 2>&1; then
+    printf "rage"
+    return 0
+  fi
+  if command -v age >/dev/null 2>&1; then
+    printf "age"
+    return 0
+  fi
+
+  echo "dot: install 'rage' (preferred) or 'age' to decrypt work secrets" >&2
+  return 1
+}
+
+prompt_age_passphrase() {
+  [ -n "$passphrase" ] && return 0
+
+  printf "Enter age passphrase: " >&2
+  stty -echo 2>/dev/null || true
+  IFS= read -r passphrase
+  stty echo 2>/dev/null || true
+  printf "\n" >&2
+
+  [ -n "$passphrase" ] || {
+    echo "dot: empty passphrase; skipping decryption" >&2
+    return 1
+  }
+
+  export passphrase
+}
+
+decrypt_age_file() {
+  enc="$1"
+  dest="$2"
+
+  [ -f "$enc" ] || return 0
+  [ -e "$dest" ] && { echo "dot: decrypted exists; skipping: $dest"; return 0; }
+
+  [ -n "$AGE_CMD" ] || AGE_CMD=$(age_command) || return 0
+
+  prompt_age_passphrase || return 1
+
+  printf "dot: decrypting %s\n" "$(basename "$enc")"
+
+  if ! printf "%s\n" "$passphrase" | "$AGE_CMD" --decrypt --passphrase -o "$dest" "$enc"; then
+    echo "dot: failed to decrypt $(basename "$enc")" >&2
+    rm -f "$dest"
+    return 1
+  fi
+}
+
+# decrypt_work_secrets() {
+#   secrets_dir="$repo_root/modules/profiles/work/secrets"
+#   [ -d "$secrets_dir" ] || return 0
+
+#   AGE_CMD=$(age_command) || return 0
+#   set -- "$secrets_dir"/*.age
+#   [ -e "$1" ] || {
+#     echo "dot: no age-encrypted work secrets found"
+#     return 0
+#   }
+
+#   passphrase="${WORK_SECRETS_PASSPHRASE:-}"
+
+#   for enc in "$@"; do
+#     [ -e "$enc" ] || continue
+#     dest="${enc%.age}"
+
+#     decrypt_age_file "$enc" "$dest" || return 1
+#   done
+
+#   echo "dot: work secrets decrypted (plaintext files stay ignored in secrets/)"
+# }
+
+run_work_bootstrap() {
+  bootstrap_script="$repo_root/modules/profiles/work/bootstrap"
+  [ -f "$bootstrap_script" ] || return 0
+
+  echo "dot: running work bootstrap script"
+  (cd "$repo_root" && sh "$bootstrap_script")
+}
+
+AGE_CMD=""
+passphrase="${WORK_SECRETS_PASSPHRASE:-}"
+# decrypt_work_secrets
+
+decrypt_age_file "$repo_root/modules/profiles/work/_brew.age" "$repo_root/modules/profiles/work/_brew"
+decrypt_age_file "$repo_root/modules/profiles/work/bootstrap.age" "$repo_root/modules/profiles/work/bootstrap"
+
+run_work_bootstrap
 
 echo "dot: wrote work git identity to $GIT_LOCAL"

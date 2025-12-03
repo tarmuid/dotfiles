@@ -1,0 +1,3 @@
+# Ignore decrypted outputs in the work module
+/_brew
+/bootstrap

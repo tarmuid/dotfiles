@@ -24,6 +24,7 @@ typeset -U path PATH
 # Prepend user binaries to the path
 path=(
     "$XDG_BIN_HOME"
+    "$XDG_DATA_HOME/dotfiles/bin"
     "$path[@]"
 )
 
