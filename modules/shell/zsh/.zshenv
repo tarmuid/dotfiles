@@ -7,6 +7,7 @@ export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 export XDG_BIN_HOME="$HOME/.local/bin"
+export DOTFILES_DIR="$XDG_DATA_HOME/dotfiles"
 
 # ------------------------------------------------------------------------------
 # 1. ZDOTDIR
@@ -24,7 +25,7 @@ typeset -U path PATH
 # Prepend user binaries to the path
 path=(
     "$XDG_BIN_HOME"
-    "$XDG_DATA_HOME/dotfiles/bin"
+    "$DOTFILES_DIR/bin"
     "$path[@]"
 )
 
@@ -52,7 +53,6 @@ export PAGER="less"
 export GNUPGHOME="$XDG_CONFIG_HOME/gnupg"
 export LESSHISTFILE="$XDG_STATE_HOME/less/history"
 export WGETRC="$XDG_CONFIG_HOME/wget/wgetrc"
-export DOTFILES_DIR="$XDG_DATA_HOME/dotfiles"
 
 # ------------------------------------------------------------------------------
 # 6. ZimFW / plugin manager settings
