@@ -1,2 +1,4 @@
 brew "mas"
 brew "rage"
+cask "font-caskaydia-cove-nerd-font"
+cask "font-jetbrains-mono-nerd-font"

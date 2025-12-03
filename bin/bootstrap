@@ -48,8 +48,8 @@ ensure_xdg_dirs() {
   XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
   XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
-  for dir in "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_STATE_HOME/zsh" "$XDG_CACHE_HOME" "$XDG_CACHE_HOME/zsh"; do
-    [ -d "$dir" ] || mkdir -p "$dir"
+  for xdg_dir in "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_STATE_HOME/zsh" "$XDG_CACHE_HOME" "$XDG_CACHE_HOME/zsh"; do
+    [ -d "$xdg_dir" ] || mkdir -p "$xdg_dir"
   done
 }
 

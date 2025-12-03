@@ -4,7 +4,6 @@ profiles:
       - apps/proton-pass
       - editors/helix
       - shell/zsh
-      - tools/fzf
       - tools/git
       - tools/gh
       - tools/lazygit
