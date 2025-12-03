@@ -8,7 +8,6 @@ if status is-interactive
     abbr --add --global bz "brew uninstall --zap"
     abbr --add --global ci "brew install --cask"
     abbr --add --global cdd "cd $DOTFILES_DIR"
-    abbr --add --global dp "$DOTFILES_DIR/bin/dot"
     abbr --add --global ll "eza --long --group-directories-first --git --no-quotes"
     abbr --add --global la "eza --long --all --group-directories-first --git --no-quotes"
     abbr --add --global gg "lazygit"
