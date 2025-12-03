@@ -1,6 +1,7 @@
 profiles:
   default:
     modules:
+      - apps/proton-pass
       - editors/helix
       - shell/zsh
       - tools/fzf

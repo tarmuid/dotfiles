@@ -1,0 +1,4 @@
+#!/usr/bin/env sh 
+
+defaults write com.googlecode.iterm2 "PrefsCustomFolder" -string "$XDG_CONFIG_HOME/iterm2"
+defaults write com.googlecode.iterm2 "LoadPrefsFromCustomFolder" -bool true
