@@ -21,6 +21,12 @@
       org-roam-directory org-directory
       org-roam-db-location (file-name-concat org-directory ".org-roam.db")
       org-roam-dailies-directory "journal/"
+      org-roam-capture-templates
+      '(("n" "note" plain "%?"
+         :target (file+head
+                  "%<%Y%m%dT%H%M%S>--${slug}%(my/org-roam-denote-keyword-suffix).org"
+                  "#+title:      ${title}\n#+date:       %<%Y-%m-%d %H:%M>\n#+filetags:   %(my/org-roam-denote-filetags)\n#+identifier: %<%Y%m%dT%H%M%S>\n\n")
+         :unnarrowed t))
       org-log-done-with-time nil)
 
 (after! org
@@ -33,40 +39,47 @@
            "* TODO %?"
            :prepend t))))
 
-(use-package! denote
-  :init
-  (setq denote-directory (expand-file-name "notes/" org-directory)
-        denote-file-type 'org
-        denote-infer-keywords t
-        denote-sort-keywords t
-        denote-allow-multi-word-keywords t
-        denote-prompts '(title keywords))
-  :config
-  (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
-  (map! :leader
-        (:prefix ("n d" . "denote")
-         :desc "New note" "n" #'denote
-         :desc "New note (type)" "t" #'denote-type
-         :desc "Open note" "f" #'denote-find-file
-         :desc "Insert link" "l" #'denote-link
-         :desc "Backlinks" "b" #'denote-link-backlinks
-         :desc "Rename file" "r" #'denote-rename-file
-         :desc "Dired rename" "R" #'denote-dired-rename-file
-         :desc "Add link to buffer" "a" #'denote-link-add-links)))
-
-
 (use-package dired
   :defer t
   :config
   (when (and (eq system-type 'darwin) (executable-find "gls"))
     (setq insert-directory-program "gls")))
 
-(use-package! ai-code-interface
-  :config
-  (ai-code-set-backend 'codex)
-  ;; Main transient menu
-  (global-set-key (kbd "C-c a") #'ai-code-menu)
+(defvar my/org-roam-denote-last-keywords ""
+  "Keywords for the last Org-roam capture, for reuse in templates.")
 
-  ;; Optional: faster auto-revert so Codex edits show up quickly
-  (global-auto-revert-mode 1)
-  (setq auto-revert-interval 1))
+(defun my/org-roam-denote-keyword-suffix ()
+  "Prompt once for Denote-style keywords and return `__kw1_kw2` or \"\"."
+  (setq my/org-roam-denote-last-keywords
+        (string-trim (downcase
+                      (read-string "Keywords (space-separated, optional): "))))
+  (if (string-empty-p my/org-roam-denote-last-keywords)
+      ""
+    (concat "__"
+            (replace-regexp-in-string
+             "[^[:alnum:]]+" "_"
+             my/org-roam-denote-last-keywords))))
+
+(defun my/org-roam-denote-filetags ()
+  "Return last keywords as Denote-style :tag1:tag2: string.
+Uses `my/org-roam-denote-last-keywords` set by
+`my/org-roam-denote-keyword-suffix`."
+  (if (or (not (boundp 'my/org-roam-denote-last-keywords))
+          (string-empty-p my/org-roam-denote-last-keywords))
+      ""
+    (let* ((words (split-string my/org-roam-denote-last-keywords "[ ,;]+" t))
+           (sanitized
+            (mapcar (lambda (w)
+                      (replace-regexp-in-string "[^[:alnum:]]+" "_" (downcase w)))
+                    words)))
+      (concat ":" (mapconcat #'identity sanitized ":") ":"))))
+
+;; (use-package! ai-code-interface
+;;   :config
+;;   (ai-code-set-backend 'codex)
+;;   ;; Main transient menu
+;;   (global-set-key (kbd "C-c a") #'ai-code-menu)
+
+;;   ;; Optional: faster auto-revert so Codex edits show up quickly
+;;   (global-auto-revert-mode 1)
+;;   (setq auto-revert-interval 1))
