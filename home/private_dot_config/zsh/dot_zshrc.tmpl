@@ -17,6 +17,21 @@ if [[ -x "/opt/homebrew/bin/brew" ]]; then
     "/opt/homebrew/sbin"
     $path
   )
+elif [[ -x "/usr/local/bin/brew" ]]; then
+  path=(
+    "/usr/local/bin"
+    "/usr/local/sbin"
+    $path
+  )
+fi
+
+# Fallback for non-login interactive shells.
+if [[ -z "${HOMEBREW_PREFIX:-}" ]]; then
+  if [[ -x "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x "/usr/local/bin/brew" ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
 fi
 
 # ============================================================================
@@ -24,8 +39,8 @@ fi
 # ============================================================================
 
 # History
-[[ -d "{{ .xdg.stateHome }}/zsh" ]] || mkdir -p "{{ .xdg.stateHome }}/zsh"
-export HISTFILE="$ZDOTDIR/history"
+[[ -d "$XDG_STATE_HOME/zsh" ]] || mkdir -p "$XDG_STATE_HOME/zsh"
+export HISTFILE="$XDG_STATE_HOME/zsh/history"
 export HISTSIZE=100000
 export SAVEHIST=100000
 
@@ -48,7 +63,7 @@ if ! (( $+functions[abbr] )); then
   alias ll="ls -al"
 fi
 
-{{ if lookPath "eza" -}}
+if (( $+commands[eza] )); then
 alias ls='eza --icons'                                   # ls
 alias l='eza -lbF --git --icons'                         # list, size, type, git
 alias ll='eza -lbGF --git --icons'                       # long list
@@ -59,7 +74,7 @@ alias lx='eza -lbhHigUmuSa@ --git --color-scale --icons' # all + extended list
 
 alias lS='eza -1'               # one column, just names
 alias lt='eza --tree --level=2' # tree
-{{- end }}
+fi
 alias tldr="tldr --config-path $XDG_CONFIG_HOME/tldr/config.toml"
 
 # ============================================================================
@@ -85,9 +100,9 @@ zstyle ':completion::complete:*' cache-path "${XDG_CACHE_HOME}/zsh/zcompcache"
 [[ -f "${ZIM_HOME}/init.zsh" ]] && source "${ZIM_HOME}/init.zsh"
 
 # Fix completions for aliased commands (must come after compinit)
-{{ if lookPath "eza" -}}
-compdef _eza ls l ll ltr llm la lx lS lt
-{{- end }}
+if (( $+commands[eza] )); then
+  compdef _eza ls l ll ltr llm la lx lS lt
+fi
 
 {{- if eq .defaults.editor "emacs" }}
 export PATH="$XDG_CONFIG_HOME/emacs/bin:$PATH"
@@ -107,45 +122,45 @@ export LAZYGIT_COMMIT_LLM_CMD="${LAZYGIT_COMMIT_LLM_CMD:-lazygit-commit-llm}"
 export LAZYGIT_CLAUDE_MODEL="${LAZYGIT_CLAUDE_MODEL:-sonnet}"
 export LAZYGIT_CODEX_MODEL="${LAZYGIT_CODEX_MODEL:-gpt-5-codex}"
 
-{{ if lookPath "zoxide" -}}
-eval "$(zoxide init zsh)"
-{{ end }}
+if (( $+commands[zoxide] )); then
+  eval "$(zoxide init zsh)"
+fi
 
-{{ if lookPath "yazi" -}}
-y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	command yazi "$@" --cwd-file="$tmp"
-	IFS= read -r -d '' cwd < "$tmp"
-	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
-	rm -f -- "$tmp"
-}
-{{- end }}
+if (( $+commands[yazi] )); then
+  y() {
+    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+    command yazi "$@" --cwd-file="$tmp"
+    IFS= read -r -d '' cwd < "$tmp"
+    [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+    rm -f -- "$tmp"
+  }
+fi
 
 # ============================================================================
 # Zellij auto-start
 # ============================================================================
 # Start zellij for interactive terminal sessions unless already inside another
 # multiplexer or command-driven interactive shell.
-{{ if lookPath "zellij" -}}
+# Set ZELLIJ_AUTO_ATTACH=0 to bypass this behavior for one shell:
+#   ZELLIJ_AUTO_ATTACH=0 zsh
 if (( $+commands[zellij] )) \
   && [[ -z "$ZELLIJ" ]] \
   && [[ -z "$TMUX" ]] \
   && [[ -z "$NVIM" ]] \
+  && [[ "${ZELLIJ_AUTO_ATTACH:-1}" != "0" ]] \
   && [[ -z "$ZSH_EXECUTION_STRING" ]] \
   && [[ "$TERM" != "dumb" ]] \
   && [[ "$TERM_PROGRAM" != "vscode" ]] \
   && [[ -t 0 ]] \
   && [[ -t 1 ]]; then
   zellij attach -c
-  exit $?
 fi
-{{ end }}
 
 # ============================================================================
 # Work-local overrides
 # ============================================================================
 
 {{- if .flags.is_work_owned }}
-local work_local_zshrc="$ZDOTDIR/zsh/work-local.zsh"
+local work_local_zshrc="$ZDOTDIR/work-local.zsh"
 [[ -f "$work_local_zshrc" ]] && source "$work_local_zshrc"
 {{- end }}

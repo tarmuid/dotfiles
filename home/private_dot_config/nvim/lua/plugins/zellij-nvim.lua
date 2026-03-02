@@ -5,10 +5,10 @@ return {
     return vim.env.ZELLIJ ~= nil
   end,
   keys = {
-    { "<C-h>", "<cmd>ZellijNavigateLeftTab<CR>", silent = true, desc = "Navigate left (pane/tab)" },
-    { "<C-j>", "<cmd>ZellijNavigateDown<CR>", silent = true, desc = "Navigate down" },
-    { "<C-k>", "<cmd>ZellijNavigateUp<CR>", silent = true, desc = "Navigate up" },
-    { "<C-l>", "<cmd>ZellijNavigateRightTab<CR>", silent = true, desc = "Navigate right (pane/tab)" },
+    { "<C-h>", "<cmd>ZellijNavigateLeft<CR>", mode = { "n", "t" }, silent = true, desc = "Navigate left" },
+    { "<C-j>", "<cmd>ZellijNavigateDown<CR>", mode = { "n", "t" }, silent = true, desc = "Navigate down" },
+    { "<C-k>", "<cmd>ZellijNavigateUp<CR>", mode = { "n", "t" }, silent = true, desc = "Navigate up" },
+    { "<C-l>", "<cmd>ZellijNavigateRight<CR>", mode = { "n", "t" }, silent = true, desc = "Navigate right" },
   },
   opts = {},
 }

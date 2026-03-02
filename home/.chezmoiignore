@@ -16,6 +16,9 @@ key.txt.age
 {{- if not (has "iterm2" .programs.terminals) }}
 .config/iterm2
 {{ end }}
+{{- if not (has "fish" .programs.shells) }}
+.config/fish
+{{- end }}
 {{ if .flags.is_work_owned }}
 .ssh/allowed_signers
 {{ end }}

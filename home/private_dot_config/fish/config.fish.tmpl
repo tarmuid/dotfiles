@@ -1,0 +1,128 @@
+{{- $theme := (index . "theme") | default dict -}}
+{{- $batTheme := (index $theme "bat") | default "Monokai Extended" -}}
+{{- $deltaTheme := ((index ((index $theme "delta") | default dict) "syntax")) | default "Monokai Extended" -}}
+# ------------------------------------------------------------------------------
+# Environment and path defaults
+# ------------------------------------------------------------------------------
+set -gx XDG_CONFIG_HOME "{{ .xdg.configHome }}"
+set -gx XDG_CACHE_HOME "{{ .xdg.cacheHome }}"
+set -gx XDG_DATA_HOME "{{ .xdg.dataHome }}"
+set -gx XDG_STATE_HOME "{{ .xdg.stateHome }}"
+set -gx XDG_BIN_HOME "{{ .xdg.binHome }}"
+
+set -gx DOTFILES_DIR "{{ .xdg.dataHome }}/chezmoi"
+set -gx HOMEBREW_NO_ENV_HINTS 1
+
+fish_add_path --prepend "{{ .xdg.binHome }}" "$DOTFILES_DIR/bin"
+
+if test -x "/opt/homebrew/bin/brew"
+    fish_add_path --prepend "/opt/homebrew/bin" "/opt/homebrew/sbin"
+end
+
+set -gx EDITOR "{{ .defaults.editor }}"
+set -gx VISUAL "$EDITOR"
+set -gx BAT_THEME "{{ $batTheme }}"
+if type -q delta
+    set -gx PAGER "delta"
+    set -gx GIT_PAGER "delta"
+    set -gx LESS "-R -F -X -i -M"
+    set -gx MANPAGER "less -R"
+    set -gx DELTA_PAGER "less -R -F -X -i -M"
+    set -gx DELTA_FEATURES "side-by-side line-numbers"
+    set -gx DELTA_NAVIGATE "true"
+    set -gx DELTA_SYNTAX_THEME "{{ $deltaTheme }}"
+else
+    set -gx PAGER "less"
+    set -gx LESS "-R -F -X -i -M"
+    set -gx MANPAGER "less -R"
+end
+
+set -gx GNUPGHOME "{{ .xdg.configHome }}/gnupg"
+set -gx LESSHISTFILE "{{ .xdg.stateHome }}/less/history"
+set -gx WGETRC "{{ .xdg.configHome }}/wget/wgetrc"
+set -gx TEALDEER_CONFIG_DIR "{{ .xdg.configHome }}/tealdeer"
+
+set -gx CARGO_HOME "{{ .xdg.dataHome }}/cargo"
+set -gx GOPATH "{{ .xdg.dataHome }}/go"
+set -gx NPM_CONFIG_USERCONFIG "{{ .xdg.configHome }}/npm/npmrc"
+set -gx NPM_CONFIG_CACHE "{{ .xdg.cacheHome }}/npm"
+set -gx NPM_CONFIG_PREFIX "{{ .xdg.dataHome }}/npm"
+set -gx RUSTUP_HOME "{{ .xdg.dataHome }}/rustup"
+set -gx TASKDATA "{{ .xdg.dataHome }}/task"
+set -gx TASKRC "{{ .xdg.configHome }}/task/taskrc"
+
+{{- if eq .defaults.editor "emacs" }}
+fish_add_path --prepend "$XDG_CONFIG_HOME/emacs/bin"
+{{- end }}
+
+set -gx LAZYGIT_COMMIT_LLM_CMD (set -q LAZYGIT_COMMIT_LLM_CMD; and echo "$LAZYGIT_COMMIT_LLM_CMD"; or echo "lazygit-commit-llm")
+set -gx LAZYGIT_CLAUDE_MODEL (set -q LAZYGIT_CLAUDE_MODEL; and echo "$LAZYGIT_CLAUDE_MODEL"; or echo "sonnet")
+set -gx LAZYGIT_CODEX_MODEL (set -q LAZYGIT_CODEX_MODEL; and echo "$LAZYGIT_CODEX_MODEL"; or echo "gpt-5-codex")
+
+status is-interactive; or return
+
+# ------------------------------------------------------------------------------
+# Interactive defaults
+# ------------------------------------------------------------------------------
+set -g fish_greeting
+
+if type -q eza
+    alias ls='eza --icons'
+    alias l='eza -lbF --git --icons'
+    alias ll='eza -lbGF --git --icons'
+    alias ltr='eza -lbGd --git --sort=modified --icons'
+    alias llm='eza --all --header --long --sort=modified --icons'
+    alias la='eza -lbhHigUmuSa --git --color-scale --icons'
+    alias lx='eza -lbhHigUmuSa@ --git --color-scale --icons'
+    alias lS='eza -1'
+    alias lt='eza --tree --level=2'
+else
+    alias ll='ls -al'
+end
+
+alias tldr='tldr --config-path $XDG_CONFIG_HOME/tldr/config.toml'
+
+if type -q mise
+    mise activate fish | source
+end
+
+if type -q zoxide
+    zoxide init fish | source
+end
+
+if type -q yazi
+    if not functions -q y
+        function y --description "Launch yazi and jump to the selected directory"
+            set -l tmp (mktemp -t yazi-cwd.XXXXXX)
+            command yazi $argv --cwd-file="$tmp"
+            if test -f "$tmp"
+                set -l cwd (command cat "$tmp")
+                if test -n "$cwd"; and test "$cwd" != "$PWD"; and test -d "$cwd"
+                    cd "$cwd"
+                end
+                command rm -f -- "$tmp"
+            end
+        end
+    end
+end
+
+# ------------------------------------------------------------------------------
+# Zellij auto-start
+# ------------------------------------------------------------------------------
+if type -q zellij
+    set -l auto_attach 1
+    if set -q ZELLIJ_AUTO_ATTACH
+        set auto_attach "$ZELLIJ_AUTO_ATTACH"
+    end
+
+    if test -z "$ZELLIJ"; and test -z "$TMUX"; and test -z "$NVIM"; and test "$auto_attach" != "0"; and test "$TERM" != "dumb"; and test "$TERM_PROGRAM" != "vscode"; and test -t 0; and test -t 1
+        zellij attach -c
+    end
+end
+
+{{- if .flags.is_work_owned }}
+set -l work_local_fish "$XDG_CONFIG_HOME/fish/work-local.fish"
+if test -f "$work_local_fish"
+    source "$work_local_fish"
+end
+{{- end }}

@@ -2,8 +2,10 @@
 {{- $ghostty := (index $theme "ghostty") | default dict -}}
 {{- $ghosttyDark := (index $ghostty "dark") | default "TokyoNight Storm" -}}
 {{- $ghosttyLight := (index $ghostty "light") | default "TokyoNight Day" -}}
+{{- $defaults := (index . "defaults") | default dict -}}
+{{- $shell := (index $defaults "shell") | default "zsh" -}}
 font-size = 12
-theme = dark:{{ $ghosttyDark }},light:{{ $ghosttyLight }}
+theme = dark:{{ $ghosttyDark }},light:{{ $ghosttyDark }}
 scrollback-limit = 1000000
 
 keybind = super+n=new_window
@@ -27,3 +29,7 @@ keybind = super+r=reload_config
 window-save-state = always
 
 auto-update-channel = tip
+
+{{- if eq $shell "fish" }}
+command = {{ .homebrew.prefix }}/bin/fish --login
+{{- end }}

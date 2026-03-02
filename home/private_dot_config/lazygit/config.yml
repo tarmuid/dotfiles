@@ -2,5 +2,5 @@ customCommands:
     - key: "C"
       context: "files"
       description: "Generate commit message with default LLM command"
-      command: "git diff --staged | ${LAZYGIT_COMMIT_LLM_CMD:-lazygit-commit-llm} 'Generate a git commit message for these staged changes. Output ONLY the raw commit message with no markdown, no code blocks, no backticks, no explanations. Use conventional commit format. Detail all changes in bullet list form.' > /tmp/commit_msg && GIT_EDITOR=nvim git commit -e -F /tmp/commit_msg"
+      command: "tmpfile=$(mktemp -t lazygit-commit-msg.XXXXXX) && trap 'rm -f \"$tmpfile\"' EXIT INT TERM HUP && git diff --staged | ${LAZYGIT_COMMIT_LLM_CMD:-lazygit-commit-llm} 'Generate a git commit message for these staged changes. Output ONLY the raw commit message with no markdown, no code blocks, no backticks, no explanations. Use conventional commit format. Detail all changes in bullet list form.' > \"$tmpfile\" && GIT_EDITOR=nvim git commit -e -F \"$tmpfile\""
       output: terminal

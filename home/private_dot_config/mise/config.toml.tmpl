@@ -1,13 +1,13 @@
 [tools]
 {{ if has "go" .toolchains -}}
-go = "latest"
+go = "1.23"
 {{- end }}
 {{ if has "node" .toolchains -}}
-node = "latest"
+node = "22"
 {{- end }}
 {{ if has "python" .toolchains -}}
-python = "latest"
+python = "3.12"
 {{- end }}
 {{ if has "rust" .toolchains -}}
-rust = "latest"
+rust = "1.84"
 {{ end }}

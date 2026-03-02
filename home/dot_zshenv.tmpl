@@ -34,15 +34,7 @@ path=(
 export PATH
 
 # ------------------------------------------------------------------------------
-# 3. Homebrew
-# ------------------------------------------------------------------------------
-
-if [ -x "/opt/homebrew/bin/brew" ]; then
-  eval "$({{ .homebrew.prefix }}/bin/brew shellenv)"
-fi
-
-# ------------------------------------------------------------------------------
-# 4. Default programs
+# 3. Default programs
 # ------------------------------------------------------------------------------
 
 export EDITOR="{{ .defaults.editor }}"
@@ -51,23 +43,24 @@ export VISUAL="$EDITOR"
 {{- $batTheme := (index $theme "bat") | default "Monokai Extended" -}}
 {{- $deltaTheme := ((index ((index $theme "delta") | default dict) "syntax")) | default "Monokai Extended" -}}
 export BAT_THEME="{{ $batTheme }}"
-{{ if lookPath "delta" -}}
-export PAGER="delta"
-export GIT_PAGER="delta"
-export LESS="-R -F -X -i -M"
-export MANPAGER="less -R"
-export DELTA_PAGER="less -R -F -X -i -M"
-export DELTA_FEATURES="side-by-side line-numbers"
-export DELTA_NAVIGATE="true"
-export DELTA_SYNTAX_THEME="{{ $deltaTheme }}"
-{{ else -}}
-export PAGER="less"
-export LESS="-R -F -X -i -M"
-export MANPAGER="less -R"
-{{ end -}}
+
+if (( $+commands[delta] )); then
+  export PAGER="delta"
+  export GIT_PAGER="delta"
+  export LESS="-R -F -X -i -M"
+  export MANPAGER="less -R"
+  export DELTA_PAGER="less -R -F -X -i -M"
+  export DELTA_FEATURES="side-by-side line-numbers"
+  export DELTA_NAVIGATE="true"
+  export DELTA_SYNTAX_THEME="{{ $deltaTheme }}"
+else
+  export PAGER="less"
+  export LESS="-R -F -X -i -M"
+  export MANPAGER="less -R"
+fi
 
 # ------------------------------------------------------------------------------
-# 5. Application XDG enforcement
+# 4. Application XDG enforcement
 # ------------------------------------------------------------------------------
 
 # Keep the home directory clean by forcing apps to use XDG dirs
@@ -90,7 +83,7 @@ export TASKDATA="{{ .xdg.dataHome }}/task"
 export TASKRC="{{ .xdg.configHome }}/task/taskrc"
 
 # ------------------------------------------------------------------------------
-# 6. Plugins and cache management
+# 5. Plugins and cache management
 # ------------------------------------------------------------------------------
 # It is best to set these here so they are ready before .zshrc loads
 export ZIM_HOME="$ZDOTDIR/.zim"
