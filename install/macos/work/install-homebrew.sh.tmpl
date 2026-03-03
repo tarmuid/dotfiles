@@ -10,4 +10,11 @@ if [[ "{{ .flags.is_work_owned }}" != "true" ]]; then
   exit 0
 fi
 
+{{ $ageKey := joinPath .chezmoi.homeDir ".config/chezmoi/key.txt" -}}
+{{ if stat $ageKey -}}
 {{ include "../install/macos/work/homebrew-install-internal.sh.age" | decrypt }}
+{{ else -}}
+echo "ERROR: AGE identity not found at {{ $ageKey }}." >&2
+echo "Run bootstrap.sh to set up encryption before applying work configs." >&2
+exit 1
+{{ end -}}

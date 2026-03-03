@@ -101,10 +101,10 @@ decrypt_age_identity() {
 
   if command -v expect >/dev/null 2>&1; then
     CHEZMOI_EXPECT_CMD="${chezmoi_cmd}" \
-    CHEZMOI_EXPECT_OUT="${age_identity}" \
-    CHEZMOI_EXPECT_SRC="${source_age_identity}" \
-    CHEZMOI_EXPECT_PASS="${passphrase}" \
-    expect -c '
+      CHEZMOI_EXPECT_OUT="${age_identity}" \
+      CHEZMOI_EXPECT_SRC="${source_age_identity}" \
+      CHEZMOI_EXPECT_PASS="${passphrase}" \
+      expect -c '
       set timeout 120
       log_user 0
       set attempts 0
@@ -141,8 +141,8 @@ decrypt_age_identity() {
 
   unset passphrase
   case "${status}" in
-    124) die "timed out waiting for age passphrase input" ;;
-    125) die "age passphrase was rejected multiple times" ;;
+  124) die "timed out waiting for age passphrase input" ;;
+  125) die "age passphrase was rejected multiple times" ;;
   esac
   return "${status}"
 }
@@ -176,8 +176,7 @@ ensure_age_identity() {
   # 2) source dir is "home" root -> ${source_dir}/key.txt.age
   for candidate in \
     "${source_dir}/key.txt.age" \
-    "${source_dir}/home/key.txt.age"
-  do
+    "${source_dir}/home/key.txt.age"; do
     if [ -f "${candidate}" ]; then
       source_age_identity="${candidate}"
       break

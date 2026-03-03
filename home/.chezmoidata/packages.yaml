@@ -15,6 +15,7 @@ packages:
         - mise
         - poppler
         - resvg
+        - rg
         - sevenzip
         - tealdeer
         - yazi

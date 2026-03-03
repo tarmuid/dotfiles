@@ -22,10 +22,14 @@ fi
 {{ $basePackages := index . "packages" | default dict -}}
 {{ $baseBrewConfig := index $basePackages "brew" | default dict -}}
 {{ $overlayBrewConfig := dict -}}
-{{- if $isWorkOwned -}}
+{{ $ageKey := joinPath .chezmoi.homeDir ".config/chezmoi/key.txt" -}}
+{{- if and $isWorkOwned (stat $ageKey) -}}
   {{- $overlayData := (include "../install/macos/work/packages.work.yaml.age" | decrypt | fromYaml) | default dict -}}
   {{- $overlayPackages := index $overlayData "packages" | default dict -}}
   {{- $overlayBrewConfig = index $overlayPackages "brew" | default dict -}}
+{{- else if $isWorkOwned -}}
+echo "WARNING: AGE identity not found at {{ $ageKey }}; skipping work package overlay." >&2
+echo "Run bootstrap.sh to set up encryption, then re-run chezmoi apply." >&2
 {{- end -}}
 
 {{ $selectedLayers := list -}}
