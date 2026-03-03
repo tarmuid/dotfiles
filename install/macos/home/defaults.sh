@@ -190,22 +190,26 @@ defaults_mail() {
     return 0
   fi
 
-  # Copy email addresses as plain addresses in Mail.app.
-  defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
+  local mail_plist="${mail_container}/Data/Library/Preferences/com.apple.mail"
 
-  # Add Cmd + Enter to send an email in Mail.app.
-  defaults write com.apple.mail NSUserKeyEquivalents -dict-add "Send" "@\U21a9"
+  (
+    # Copy email addresses as plain addresses in Mail.app.
+    defaults write "${mail_plist}" AddressesIncludeNameOnPasteboard -bool false
 
-  # Display emails in threaded mode, newest first.
-  defaults write com.apple.mail DraftsViewerAttributes -dict-add "DisplayInThreadedMode" -string "yes"
-  defaults write com.apple.mail DraftsViewerAttributes -dict-add "SortedDescending" -string "yes"
-  defaults write com.apple.mail DraftsViewerAttributes -dict-add "SortOrder" -string "received-date"
+    # Add Cmd + Enter to send an email in Mail.app.
+    defaults write "${mail_plist}" NSUserKeyEquivalents -dict-add "Send" "@\U21a9"
 
-  # Disable inline attachments.
-  defaults write com.apple.mail DisableInlineAttachmentViewing -bool true
+    # Display emails in threaded mode, newest first.
+    defaults write "${mail_plist}" DraftsViewerAttributes -dict-add "DisplayInThreadedMode" -string "yes"
+    defaults write "${mail_plist}" DraftsViewerAttributes -dict-add "SortedDescending" -string "yes"
+    defaults write "${mail_plist}" DraftsViewerAttributes -dict-add "SortOrder" -string "received-date"
 
-  # Disable automatic spell checking.
-  defaults write com.apple.mail SpellCheckingBehavior -string "NoSpellCheckingEnabled"
+    # Disable inline attachments.
+    defaults write "${mail_plist}" DisableInlineAttachmentViewing -bool true
+
+    # Disable automatic spell checking.
+    defaults write "${mail_plist}" SpellCheckingBehavior -string "NoSpellCheckingEnabled"
+  ) 2>/dev/null || echo "Could not write Mail.app defaults (terminal may need Full Disk Access)." >&2
 }
 
 configure_touch_id_for_sudo() {
