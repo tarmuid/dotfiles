@@ -1,0 +1,31 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env zsh
+
+set -Eeuo pipefail
+
+{{- if eq .defaults.browser "brave" }}
+export DOCK_BROWSER_PATH="/Applications/Brave Browser.app"
+{{- else if eq .defaults.browser "safari" }}
+export DOCK_BROWSER_PATH="/System/Applications/Safari.app"
+{{- end }}
+
+{{- if eq .defaults.terminal "ghostty" }}
+export DOCK_TERMINAL_PATH="/Applications/Ghostty.app"
+{{- else if eq .defaults.terminal "kitty" }}
+export DOCK_TERMINAL_PATH="/Applications/kitty.app"
+{{- else if eq .defaults.terminal "alacritty" }}
+export DOCK_TERMINAL_PATH="/Applications/Alacritty.app"
+{{- else if eq .defaults.terminal "wezterm" }}
+export DOCK_TERMINAL_PATH="/Applications/WezTerm.app"
+{{- else if eq .defaults.terminal "iterm2" }}
+export DOCK_TERMINAL_PATH="/Applications/iTerm.app"
+{{- end }}
+
+{{- if eq .defaults.password_manager "1password" }}
+export DOCK_PASSWORD_MANAGER_PATH="/Applications/1Password.app"
+{{- else if eq .defaults.password_manager "secretive" }}
+export DOCK_PASSWORD_MANAGER_PATH="/System/Applications/Passwords.app"
+{{- end }}
+
+{{ include "../install/macos/home/dock.sh" }}
+{{- end }}

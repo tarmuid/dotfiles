@@ -50,7 +50,7 @@ defaults_keyboard() {
   # Change Caps to Ctrl.
   # ref. https://stackoverflow.com/a/46460200
   hidutil property --set \
-    '{"UserKeyMapping": [{"HIDKeyboardModifierMappingSrc": 0x700000039, "HIDKeyboardModifierMappingDst": 0x7000000e0 }] }'
+    '{"UserKeyMapping": [{"HIDKeyboardModifierMappingSrc": 0x700000039, "HIDKeyboardModifierMappingDst": 0x7000000e0 }] }' >/dev/null
 }
 
 defaults_monitor() {
