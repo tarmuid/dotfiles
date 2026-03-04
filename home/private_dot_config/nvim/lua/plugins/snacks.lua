@@ -6,15 +6,11 @@ return {
         sources = {
           explorer = {
             hidden = true,
-            actions = {
-              ["confirm"] = { action = "confirm", auto_close = false },
-              ["toggle_hidden"] = { action = "toggle_hidden", auto_close = false },
-            },
             win = {
               list = {
                 keys = {
-                  ["<CR>"] = "confirm",
-                  ["<Tab>"] = "toggle_hidden",
+                  ["<CR>"] = { "select_and_next", mode = { "n", "x" } },
+                  ["<Tab>"] = "confirm",
                 },
               },
             },

@@ -3,6 +3,7 @@ packages:
     base:
       taps: []
       formulae:
+        - bat
         - chafa
         - chezmoi
         - dockutil
@@ -24,6 +25,7 @@ packages:
         - zoxide
       casks:
         - font-jetbrains-mono-nerd-font
+        - raycast
 
     ownership:
       personal:
