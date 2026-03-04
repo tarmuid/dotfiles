@@ -174,6 +174,19 @@ defaults_finder() {
   defaults write -g NSBrowserColumnAnimationSpeedMultiplier -float 0.001
 }
 
+defaults_spotlight() {
+  # Disable Spotlight search shortcut (Cmd+Space).
+  defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 \
+    '<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>32</integer><integer>49</integer><integer>1048576</integer></array><key>type</key><string>standard</string></dict></dict>'
+}
+
+configure_raycast() {
+  # Set Raycast global hotkey to Cmd+Space (only if Raycast has been launched).
+  if defaults read com.raycast.macos &>/dev/null; then
+    defaults write com.raycast.macos raycastGlobalHotkey -string "Command-49"
+  fi
+}
+
 defaults_launchpad() {
   defaults write com.apple.dock springboard-columns -int 8
   defaults write com.apple.dock springboard-rows -int 8
@@ -259,8 +272,10 @@ main() {
   defaults_monitor
   defaults_dock
   defaults_finder
+  defaults_spotlight
   defaults_launchpad
   defaults_mail
+  configure_raycast
   configure_touch_id_for_sudo
   configure_iterm
   kill_affected_applications
