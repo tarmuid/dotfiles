@@ -1,12 +1,26 @@
-{{- $ownershipChoices := list "personal" "work_flex" "work_strict" -}}
 {{- $existingDefaults := (index . "defaults") | default dict -}}
 {{- $existingPrograms := (index . "programs") | default dict -}}
+
+{{- $falseTokens := list "0" "false" "no" "off" -}}
+{{- $trueTokens := list "1" "true" "yes" "on" -}}
+{{- $interactiveEnv := lower (trim (env "CHEZMOI_INTERACTIVE")) -}}
+{{- $isInteractive := true -}}
+{{- if has $interactiveEnv $falseTokens -}}
+  {{- $isInteractive = false -}}
+{{- else if has $interactiveEnv $trueTokens -}}
+  {{- $isInteractive = true -}}
+{{- end -}}
+
+{{- $ownershipChoices := list "personal" "work_flex" "work_strict" -}}
 {{- $existingOwnership := (index . "ownership") | default "" -}}
 {{- $ownership := or (env "CHEZMOI_OWNERSHIP") $existingOwnership -}}
 {{- if eq $ownership "" -}}
-  {{- $ownership = promptChoiceOnce . "ownership" "Who owns this system" $ownershipChoices "personal" -}}
+  {{- if $isInteractive -}}
+    {{- $ownership = promptChoiceOnce . "ownership" "Who owns this system" $ownershipChoices "personal" -}}
+  {{- else -}}
+    {{- $ownership = "personal" -}}
+  {{- end -}}
 {{- end -}}
-
 {{- if not (has $ownership $ownershipChoices) -}}
   {{- $ownership = "personal" -}}
 {{- end -}}
@@ -15,11 +29,30 @@
 {{- $existingProfile := (index . "profile") | default "" -}}
 {{- $profile := or (env "CHEZMOI_PROFILE") $existingProfile -}}
 {{- if eq $profile "" -}}
-  {{- $profile = promptChoiceOnce . "profile" "Which system profile is this" $profileChoices "portable" -}}
+  {{- if $isInteractive -}}
+    {{- $profile = promptChoiceOnce . "profile" "Which system profile is this" $profileChoices "portable" -}}
+  {{- else -}}
+    {{- $profile = "portable" -}}
+  {{- end -}}
 {{- end -}}
-
 {{- if not (has $profile $profileChoices) -}}
   {{- $profile = "portable" -}}
+{{- end -}}
+
+{{- $deploymentChoices := list "desktop" "vm" "container" "headless" -}}
+{{- $existingDeployment := (index . "deployment") | default "" -}}
+{{- $deployment := or (env "CHEZMOI_DEPLOYMENT") $existingDeployment "desktop" -}}
+{{- if not (has $deployment $deploymentChoices) -}}
+  {{- $deployment = "desktop" -}}
+{{- end -}}
+
+{{- $isHeadless := eq $deployment "headless" -}}
+{{- $allowGuiEnv := lower (trim (env "CHEZMOI_ALLOW_GUI")) -}}
+{{- $isGuiAllowed := eq $deployment "desktop" -}}
+{{- if has $allowGuiEnv $trueTokens -}}
+  {{- $isGuiAllowed = true -}}
+{{- else if has $allowGuiEnv $falseTokens -}}
+  {{- $isGuiAllowed = false -}}
 {{- end -}}
 
 {{- $defaultCapacity := "development" -}}
@@ -31,10 +64,18 @@
   {{- $name = or (env "WORK_NAME") (env "CHEZMOI_NAME") ((index . "name") | default "") -}}
   {{- $email = or (env "WORK_EMAIL") (env "CHEZMOI_EMAIL") ((index . "email") | default "") -}}
   {{- if eq $name "" -}}
-    {{- $name = promptStringOnce . "name" "What is your work name" -}}
+    {{- if $isInteractive -}}
+      {{- $name = promptStringOnce . "name" "What is your work name" -}}
+    {{- else -}}
+      {{- $name = "Work User" -}}
+    {{- end -}}
   {{- end -}}
   {{- if eq $email "" -}}
-    {{- $email = promptStringOnce . "email" "What is your work email" -}}
+    {{- if $isInteractive -}}
+      {{- $email = promptStringOnce . "email" "What is your work email" -}}
+    {{- else -}}
+      {{- $email = "work@example.com" -}}
+    {{- end -}}
   {{- end -}}
 {{- else -}}
   {{- $name = or (env "CHEZMOI_NAME") ((index . "name") | default "") "heliologos" -}}
@@ -42,78 +83,270 @@
 {{- end -}}
 
 {{- $availableShells := list "zsh" "fish" "nushell" -}}
-{{- $availableBrowsers := list "brave" "safari" -}}
-{{- $availableTerminals := list "ghostty" "kitty" "alacritty" "wezterm" "iterm2" -}}
+{{- $availableBrowsers := list "brave" "safari" "none" -}}
+{{- $availableTerminals := list "ghostty" "kitty" "alacritty" "wezterm" "iterm2" "terminal" -}}
 {{- $availableEditors := list "nvim" "vim" "emacs" "vscode" "zed" -}}
-{{- $availablePasswordManagers := list "1password" "secretive" "bitwarden" "proton-pass" -}}
+{{- $availablePasswordManagers := list "1password" "secretive" "bitwarden" "proton-pass" "none" -}}
 {{- $availableToolchains := list "mise" "go" "node" "python" "rust" -}}
 {{- $capacityChoices := list "gaming" "development" "media" -}}
 
 {{- /* default programs: single choice per category */ -}}
 {{- $shell := "zsh" -}}
-{{- $browser := or (env "CHEZMOI_DEFAULT_BROWSER") ((index $existingDefaults "browser") | default "") -}}
-{{- if eq $browser "" -}}
-  {{- $browser = promptChoiceOnce . "defaults.browser" "Default browser" $availableBrowsers "brave" -}}
-{{- end -}}
-{{- $terminal := or (env "CHEZMOI_DEFAULT_TERMINAL") ((index $existingDefaults "terminal") | default "") -}}
-{{- if eq $terminal "" -}}
-  {{- $terminal = promptChoiceOnce . "defaults.terminal" "Primary terminal" $availableTerminals "iterm2" -}}
-{{- end -}}
-{{- $editor := or (env "CHEZMOI_DEFAULT_EDITOR") ((index $existingDefaults "editor") | default "") -}}
-{{- if eq $editor "" -}}
-  {{- $editor = promptChoiceOnce . "defaults.editor" "Primary editor" $availableEditors "nvim" -}}
-{{- end -}}
-{{- $passwordManager := or (env "CHEZMOI_DEFAULT_PASSWORD_MANAGER") ((index $existingDefaults "password_manager") | default "") -}}
-{{- if eq $passwordManager "" -}}
-  {{- $passwordManager = promptChoiceOnce . "defaults.password_manager" "Primary password manager" $availablePasswordManagers "1password" -}}
+
+{{- $browserDefault := "brave" -}}
+{{- if not $isGuiAllowed -}}
+  {{- $browserDefault = "none" -}}
 {{- end -}}
 
+{{- $terminalDefault := "ghostty" -}}
+
+{{- $passwordManagerDefault := "none" -}}
+{{- if and (eq .chezmoi.os "darwin") $isGuiAllowed -}}
+  {{- $passwordManagerDefault = "1password" -}}
+{{- end -}}
+
+{{- $browser := or (env "CHEZMOI_DEFAULT_BROWSER") ((index $existingDefaults "browser") | default "") -}}
+{{- if eq $browser "" -}}
+  {{- if $isInteractive -}}
+    {{- $browser = promptChoiceOnce . "defaults.browser" "Default browser" $availableBrowsers $browserDefault -}}
+  {{- else -}}
+    {{- $browser = $browserDefault -}}
+  {{- end -}}
+{{- end -}}
 {{- if not (has $browser $availableBrowsers) -}}
-  {{- $browser = "brave" -}}
+  {{- $browser = $browserDefault -}}
+{{- end -}}
+{{- if not $isGuiAllowed -}}
+  {{- $browser = "none" -}}
+{{- end -}}
+
+{{- $terminal := or (env "CHEZMOI_DEFAULT_TERMINAL") ((index $existingDefaults "terminal") | default "") -}}
+{{- if eq $terminal "" -}}
+  {{- if $isInteractive -}}
+    {{- $terminal = promptChoiceOnce . "defaults.terminal" "Primary terminal" $availableTerminals $terminalDefault -}}
+  {{- else -}}
+    {{- $terminal = $terminalDefault -}}
+  {{- end -}}
 {{- end -}}
 {{- if not (has $terminal $availableTerminals) -}}
-  {{- $terminal = "iterm2" -}}
+  {{- $terminal = $terminalDefault -}}
+{{- end -}}
+{{- if not $isGuiAllowed -}}
+  {{- $terminal = "none" -}}
+{{- end -}}
+
+{{- $editor := or (env "CHEZMOI_DEFAULT_EDITOR") ((index $existingDefaults "editor") | default "") -}}
+{{- if eq $editor "" -}}
+  {{- if $isInteractive -}}
+    {{- $editor = promptChoiceOnce . "defaults.editor" "Primary editor" $availableEditors "nvim" -}}
+  {{- else -}}
+    {{- $editor = "nvim" -}}
+  {{- end -}}
 {{- end -}}
 {{- if not (has $editor $availableEditors) -}}
   {{- $editor = "nvim" -}}
 {{- end -}}
+
+{{- $passwordManager := or (env "CHEZMOI_DEFAULT_PASSWORD_MANAGER") ((index $existingDefaults "password_manager") | default "") -}}
+{{- if eq $passwordManager "" -}}
+  {{- if $isInteractive -}}
+    {{- $passwordManager = promptChoiceOnce . "defaults.password_manager" "Primary password manager" $availablePasswordManagers $passwordManagerDefault -}}
+  {{- else -}}
+    {{- $passwordManager = $passwordManagerDefault -}}
+  {{- end -}}
+{{- end -}}
 {{- if not (has $passwordManager $availablePasswordManagers) -}}
-  {{- $passwordManager = "1password" -}}
+  {{- $passwordManager = $passwordManagerDefault -}}
+{{- end -}}
+{{- if not $isGuiAllowed -}}
+  {{- $passwordManager = "none" -}}
 {{- end -}}
 
 {{- /* optional programs: multiple selections */ -}}
+{{- $capacitySeedRaw := trim (env "CHEZMOI_CAPACITIES") -}}
+{{- $capacitySeed := list -}}
+{{- if ne $capacitySeedRaw "" -}}
+  {{- range (splitList "," $capacitySeedRaw) -}}
+    {{- $item := trim . -}}
+    {{- if and (has $item $capacityChoices) (not (has $item $capacitySeed)) -}}
+      {{- $capacitySeed = append $capacitySeed $item -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
 {{- $enabledCapacitiesRaw := (index . "capacities") | default (list) -}}
-{{- if eq (len $enabledCapacitiesRaw) 0 -}}
-  {{- $enabledCapacitiesRaw = promptMultichoiceOnce . "capacities" "Enable capacities" $capacityChoices (list $defaultCapacity) -}}
+{{- if gt (len $capacitySeed) 0 -}}
+  {{- $enabledCapacitiesRaw = $capacitySeed -}}
+{{- else if eq (len $enabledCapacitiesRaw) 0 -}}
+  {{- if $isInteractive -}}
+    {{- $enabledCapacitiesRaw = promptMultichoiceOnce . "capacities" "Enable capacities" $capacityChoices (list $defaultCapacity) -}}
+  {{- else -}}
+    {{- $enabledCapacitiesRaw = list $defaultCapacity -}}
+  {{- end -}}
 {{- end -}}
 {{- $enabledCapacities := list -}}
 {{- range $enabledCapacitiesRaw -}}
-  {{- if has . $capacityChoices -}}
-    {{- $enabledCapacities = append $enabledCapacities . -}}
+  {{- $item := trim . -}}
+  {{- if and (has $item $capacityChoices) (not (has $item $enabledCapacities)) -}}
+    {{- $enabledCapacities = append $enabledCapacities $item -}}
   {{- end -}}
 {{- end -}}
 {{- if eq (len $enabledCapacities) 0 -}}
   {{- $enabledCapacities = list $defaultCapacity -}}
 {{- end -}}
-{{- $enabledShells := (index $existingPrograms "shells") | default (list) -}}
+
+{{- $shellSeedRaw := trim (env "CHEZMOI_PROGRAM_SHELLS") -}}
+{{- $shellSeed := list -}}
+{{- if ne $shellSeedRaw "" -}}
+  {{- range (splitList "," $shellSeedRaw) -}}
+    {{- $item := trim . -}}
+    {{- if and (has $item $availableShells) (not (has $item $shellSeed)) -}}
+      {{- $shellSeed = append $shellSeed $item -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $enabledShellsRaw := (index $existingPrograms "shells") | default (list) -}}
+{{- if gt (len $shellSeed) 0 -}}
+  {{- $enabledShellsRaw = $shellSeed -}}
+{{- else if eq (len $enabledShellsRaw) 0 -}}
+  {{- if $isInteractive -}}
+    {{- $enabledShellsRaw = promptMultichoiceOnce . "programs.shells" "Enable shells" $availableShells (list $shell) -}}
+  {{- else -}}
+    {{- $enabledShellsRaw = list $shell -}}
+  {{- end -}}
+{{- end -}}
+{{- $enabledShells := list -}}
+{{- range $enabledShellsRaw -}}
+  {{- $item := trim . -}}
+  {{- if and (has $item $availableShells) (not (has $item $enabledShells)) -}}
+    {{- $enabledShells = append $enabledShells $item -}}
+  {{- end -}}
+{{- end -}}
 {{- if eq (len $enabledShells) 0 -}}
-  {{- $enabledShells = promptMultichoiceOnce . "programs.shells" "Enable shells" $availableShells (list $shell) -}}
+  {{- $enabledShells = list $shell -}}
 {{- end -}}
-{{- $enabledPasswordManagers := (index $existingPrograms "password_managers") | default (list) -}}
-{{- if eq (len $enabledPasswordManagers) 0 -}}
-  {{- $enabledPasswordManagers = promptMultichoiceOnce . "programs.password_managers" "Enable password managers" $availablePasswordManagers (list $passwordManager) -}}
+
+{{- $passwordManagerSeedRaw := trim (env "CHEZMOI_PROGRAM_PASSWORD_MANAGERS") -}}
+{{- $passwordManagerSeed := list -}}
+{{- if ne $passwordManagerSeedRaw "" -}}
+  {{- range (splitList "," $passwordManagerSeedRaw) -}}
+    {{- $item := trim . -}}
+    {{- if and (has $item $availablePasswordManagers) (ne $item "none") (not (has $item $passwordManagerSeed)) -}}
+      {{- $passwordManagerSeed = append $passwordManagerSeed $item -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
-{{- $enabledTerminals := (index $existingPrograms "terminals") | default (list) -}}
-{{- if eq (len $enabledTerminals) 0 -}}
-  {{- $enabledTerminals = promptMultichoiceOnce . "programs.terminals" "Enable terminals" $availableTerminals (list $terminal) -}}
+{{- $defaultEnabledPasswordManagers := list -}}
+{{- if ne $passwordManager "none" -}}
+  {{- $defaultEnabledPasswordManagers = append $defaultEnabledPasswordManagers $passwordManager -}}
 {{- end -}}
-{{- $enabledEditors := (index $existingPrograms "editors") | default (list) -}}
+{{- $enabledPasswordManagersRaw := (index $existingPrograms "password_managers") | default (list) -}}
+{{- if gt (len $passwordManagerSeed) 0 -}}
+  {{- $enabledPasswordManagersRaw = $passwordManagerSeed -}}
+{{- else if eq (len $enabledPasswordManagersRaw) 0 -}}
+  {{- if $isInteractive -}}
+    {{- $enabledPasswordManagersRaw = promptMultichoiceOnce . "programs.password_managers" "Enable password managers" $availablePasswordManagers $defaultEnabledPasswordManagers -}}
+  {{- else -}}
+    {{- $enabledPasswordManagersRaw = $defaultEnabledPasswordManagers -}}
+  {{- end -}}
+{{- end -}}
+{{- $enabledPasswordManagers := list -}}
+{{- range $enabledPasswordManagersRaw -}}
+  {{- $item := trim . -}}
+  {{- if and (has $item $availablePasswordManagers) (ne $item "none") (not (has $item $enabledPasswordManagers)) -}}
+    {{- $enabledPasswordManagers = append $enabledPasswordManagers $item -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $terminalSeedRaw := trim (env "CHEZMOI_PROGRAM_TERMINALS") -}}
+{{- $terminalSeed := list -}}
+{{- if ne $terminalSeedRaw "" -}}
+  {{- range (splitList "," $terminalSeedRaw) -}}
+    {{- $item := trim . -}}
+    {{- if and (has $item $availableTerminals) (ne $item "none") (not (has $item $terminalSeed)) -}}
+      {{- $terminalSeed = append $terminalSeed $item -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $defaultEnabledTerminals := list -}}
+{{- if ne $terminal "none" -}}
+  {{- $defaultEnabledTerminals = append $defaultEnabledTerminals $terminal -}}
+{{- end -}}
+{{- $enabledTerminalsRaw := (index $existingPrograms "terminals") | default (list) -}}
+{{- if gt (len $terminalSeed) 0 -}}
+  {{- $enabledTerminalsRaw = $terminalSeed -}}
+{{- else if eq (len $enabledTerminalsRaw) 0 -}}
+  {{- if $isInteractive -}}
+    {{- $enabledTerminalsRaw = promptMultichoiceOnce . "programs.terminals" "Enable terminals" $availableTerminals $defaultEnabledTerminals -}}
+  {{- else -}}
+    {{- $enabledTerminalsRaw = $defaultEnabledTerminals -}}
+  {{- end -}}
+{{- end -}}
+{{- $enabledTerminals := list -}}
+{{- range $enabledTerminalsRaw -}}
+  {{- $item := trim . -}}
+  {{- if and (has $item $availableTerminals) (ne $item "none") (not (has $item $enabledTerminals)) -}}
+    {{- $enabledTerminals = append $enabledTerminals $item -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $editorSeedRaw := trim (env "CHEZMOI_PROGRAM_EDITORS") -}}
+{{- $editorSeed := list -}}
+{{- if ne $editorSeedRaw "" -}}
+  {{- range (splitList "," $editorSeedRaw) -}}
+    {{- $item := trim . -}}
+    {{- if and (has $item $availableEditors) (not (has $item $editorSeed)) -}}
+      {{- $editorSeed = append $editorSeed $item -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $enabledEditorsRaw := (index $existingPrograms "editors") | default (list) -}}
+{{- if gt (len $editorSeed) 0 -}}
+  {{- $enabledEditorsRaw = $editorSeed -}}
+{{- else if eq (len $enabledEditorsRaw) 0 -}}
+  {{- if $isInteractive -}}
+    {{- $enabledEditorsRaw = promptMultichoiceOnce . "programs.editors" "Enable editors" $availableEditors (list $editor) -}}
+  {{- else -}}
+    {{- $enabledEditorsRaw = list $editor -}}
+  {{- end -}}
+{{- end -}}
+{{- $enabledEditors := list -}}
+{{- range $enabledEditorsRaw -}}
+  {{- $item := trim . -}}
+  {{- if and (has $item $availableEditors) (not (has $item $enabledEditors)) -}}
+    {{- $enabledEditors = append $enabledEditors $item -}}
+  {{- end -}}
+{{- end -}}
 {{- if eq (len $enabledEditors) 0 -}}
-  {{- $enabledEditors = promptMultichoiceOnce . "programs.editors" "Enable editors" $availableEditors (list $editor) -}}
+  {{- $enabledEditors = list $editor -}}
 {{- end -}}
-{{- $enabledToolchains := (index . "toolchains") | default (list) -}}
-{{- if eq (len $enabledToolchains) 0 -}}
-  {{- $enabledToolchains = promptMultichoiceOnce . "toolchains" "Enable language toolchains" $availableToolchains (list) -}}
+
+{{- $toolchainSeedRaw := trim (or (env "CHEZMOI_PROGRAM_TOOLCHAINS") (env "CHEZMOI_TOOLCHAINS")) -}}
+{{- $toolchainSeed := list -}}
+{{- if ne $toolchainSeedRaw "" -}}
+  {{- range (splitList "," $toolchainSeedRaw) -}}
+    {{- $item := trim . -}}
+    {{- if and (has $item $availableToolchains) (not (has $item $toolchainSeed)) -}}
+      {{- $toolchainSeed = append $toolchainSeed $item -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $enabledToolchainsRaw := (index . "toolchains") | default (list) -}}
+{{- if gt (len $toolchainSeed) 0 -}}
+  {{- $enabledToolchainsRaw = $toolchainSeed -}}
+{{- else if eq (len $enabledToolchainsRaw) 0 -}}
+  {{- if $isInteractive -}}
+    {{- $enabledToolchainsRaw = promptMultichoiceOnce . "toolchains" "Enable language toolchains" $availableToolchains (list) -}}
+  {{- else -}}
+    {{- $enabledToolchainsRaw = list -}}
+  {{- end -}}
+{{- end -}}
+{{- $enabledToolchains := list -}}
+{{- range $enabledToolchainsRaw -}}
+  {{- $item := trim . -}}
+  {{- if and (has $item $availableToolchains) (not (has $item $enabledToolchains)) -}}
+    {{- $enabledToolchains = append $enabledToolchains $item -}}
+  {{- end -}}
 {{- end -}}
 
 {{- $xdgConfigHome := env "XDG_CONFIG_HOME" | default (printf "%s/.config" .chezmoi.homeDir) -}}
@@ -134,12 +367,15 @@ pager: {{ if lookPath "bat" }}"bat"{{ else }}"cat"{{ end }}
 data:
   name: {{ $name | quote }}
   email: {{ $email | quote }}
-  signing_key: "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBSCvAK0qU7SE790815rs/DCb3J6/TZXtZCn3KU6Qf5FEsYInhqyjuZJVp6I7cMLYIT6AVMgyZdtQ4phrNieqWE="
+  signing_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH3h9tju97PYWlIax2f6vDPgj8kT3hmcvZGHf5CR0kXI"
   ownership: {{ $ownership | quote }}
   profile: {{ $profile | quote }}
+  deployment: {{ $deployment | quote }}
   capacities: {{ $enabledCapacities | toJson }}
   flags:
     is_work_owned: {{ $isWorkOwned }}
+    is_headless: {{ $isHeadless }}
+    is_gui_allowed: {{ $isGuiAllowed }}
   defaults:
     shell: {{ $shell | quote }}
     browser: {{ $browser | quote }}

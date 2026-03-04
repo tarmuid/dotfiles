@@ -225,6 +225,72 @@ resolve_age_recipient() {
   "${chezmoi_cmd}" age-keygen -y "${age_identity}"
 }
 
+is_container_environment() {
+  if [ -f "/.dockerenv" ] || [ -f "/run/.containerenv" ]; then
+    return 0
+  fi
+
+  if [ -n "${container:-}" ]; then
+    return 0
+  fi
+
+  if [ -r "/proc/1/cgroup" ] && grep -Eiq '(docker|containerd|kubepods|podman|lxc)' /proc/1/cgroup; then
+    return 0
+  fi
+
+  return 1
+}
+
+detect_deployment() {
+  if is_container_environment; then
+    printf '%s\n' "container"
+    return 0
+  fi
+
+  os_name="$(uname -s 2>/dev/null || true)"
+  if [ "${os_name}" = "Darwin" ]; then
+    if [ -n "${SSH_CONNECTION:-}" ] || [ -n "${SSH_TTY:-}" ]; then
+      printf '%s\n' "headless"
+      return 0
+    fi
+
+    console_user="$(stat -f '%Su' /dev/console 2>/dev/null || true)"
+    if [ -z "${console_user}" ] || [ "${console_user}" = "root" ] || [ "${console_user}" = "loginwindow" ]; then
+      printf '%s\n' "headless"
+      return 0
+    fi
+  fi
+
+  printf '%s\n' "desktop"
+}
+
+configure_chezmoi_runtime_environment() {
+  if [ -z "${CHEZMOI_INTERACTIVE:-}" ]; then
+    if [ -t 0 ] && [ -t 1 ]; then
+      CHEZMOI_INTERACTIVE="1"
+    else
+      CHEZMOI_INTERACTIVE="0"
+    fi
+    export CHEZMOI_INTERACTIVE
+  fi
+
+  if [ -z "${CHEZMOI_DEPLOYMENT:-}" ]; then
+    CHEZMOI_DEPLOYMENT="$(detect_deployment)"
+    export CHEZMOI_DEPLOYMENT
+  fi
+
+  if [ -z "${CHEZMOI_ALLOW_GUI:-}" ]; then
+    if [ "${CHEZMOI_DEPLOYMENT}" = "desktop" ]; then
+      CHEZMOI_ALLOW_GUI="1"
+    else
+      CHEZMOI_ALLOW_GUI="0"
+    fi
+    export CHEZMOI_ALLOW_GUI
+  fi
+
+  log "Runtime defaults: CHEZMOI_INTERACTIVE=${CHEZMOI_INTERACTIVE} CHEZMOI_DEPLOYMENT=${CHEZMOI_DEPLOYMENT} CHEZMOI_ALLOW_GUI=${CHEZMOI_ALLOW_GUI}"
+}
+
 main() {
   dotfiles_repo="$(resolve_dotfiles_repo "${1:-}")"
   dotfiles_branch="${DOTFILES_BRANCH:-${DEFAULT_DOTFILES_BRANCH}}"
@@ -245,7 +311,10 @@ main() {
   export CHEZMOI_AGE_IDENTITY="${age_identity}"
   export CHEZMOI_AGE_RECIPIENT="${age_recipient}"
 
-  log "[5/5] Applying dotfiles..."
+  log "[5/6] Configuring deployment defaults..."
+  configure_chezmoi_runtime_environment
+
+  log "[6/6] Applying dotfiles..."
   "${chezmoi_cmd}" apply
 
   log "Bootstrap complete."

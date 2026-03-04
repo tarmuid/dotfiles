@@ -1,24 +1,30 @@
-{{- if ne .defaults.password_manager "1password" }}
+{{- $flags := (index . "flags") | default dict -}}
+{{- $programs := (index . "programs") | default dict -}}
+{{- $terminals := (index $programs "terminals") | default list -}}
+{{- $shells := (index $programs "shells") | default list -}}
+{{- $isWorkOwned := (index $flags "is_work_owned") | default false -}}
+{{- $isGuiAllowed := (index $flags "is_gui_allowed") | default (eq .chezmoi.os "darwin") -}}
+{{- if or (ne .chezmoi.os "darwin") (not $isGuiAllowed) (ne .defaults.password_manager "1password") }}
 .local/state/1password/agent.sock
 {{- end }}
 {{ if ne .chezmoi.os "darwin" -}}
 .hushlogin
 {{ end -}}
 .config/git/config-work.age
-{{- if not .flags.is_work_owned }}
+{{- if not $isWorkOwned }}
 .config/git/config-work
 {{- end }}
 .config/zsh/work-local.zsh.age
-{{- if not .flags.is_work_owned }}
+{{- if not $isWorkOwned }}
 .config/zsh/work-local.zsh
 {{- end }}
 key.txt.age
-{{- if not (has "iterm2" .programs.terminals) }}
+{{- if or (ne .chezmoi.os "darwin") (not $isGuiAllowed) (not (has "iterm2" $terminals)) }}
 .config/iterm2
 {{ end }}
-{{- if not (has "fish" .programs.shells) }}
+{{- if not (has "fish" $shells) }}
 .config/fish
 {{- end }}
-{{ if .flags.is_work_owned }}
+{{ if $isWorkOwned }}
 .ssh/allowed_signers
 {{ end }}

@@ -9,7 +9,10 @@ fi
 {{ $ownership := index . "ownership" | default "personal" -}}
 {{ $isWorkOwned := or (eq $ownership "work_flex") (eq $ownership "work_strict") -}}
 {{ $profile := index . "profile" | default "portable" -}}
+{{ $deployment := index . "deployment" | default "desktop" -}}
 {{ $capacities := index . "capacities" | default (list "development") -}}
+{{ $flags := index . "flags" | default dict -}}
+{{ $isGuiAllowed := index $flags "is_gui_allowed" | default (eq $deployment "desktop") -}}
 {{ $programs := index . "programs" | default dict -}}
 {{ $enabledPasswordManagers := index $programs "password_managers" | default list -}}
 {{ $enabledTerminals := index $programs "terminals" | default list -}}
@@ -42,6 +45,9 @@ echo "Run bootstrap.sh to set up encryption, then re-run chezmoi apply." >&2
 
   {{ $profileLayers := index $brewConfig "profiles" | default dict -}}
   {{ $selectedLayers = append $selectedLayers (index $profileLayers $profile | default dict) -}}
+
+  {{ $deploymentLayers := index $brewConfig "deployments" | default dict -}}
+  {{ $selectedLayers = append $selectedLayers (index $deploymentLayers $deployment | default dict) -}}
 
   {{ $capacityLayers := index $brewConfig "capacities" | default dict -}}
   {{ range $capacity := $capacities -}}
@@ -92,6 +98,9 @@ echo "Run bootstrap.sh to set up encryption, then re-run chezmoi apply." >&2
 {{ end -}}
 {{ range $kind := $kinds -}}
   {{ $_ := set $brewItems $kind (uniq (index $brewItems $kind | default list)) -}}
+{{ end -}}
+{{ if not $isGuiAllowed -}}
+  {{ $_ := set $brewItems "casks" (list) -}}
 {{ end -}}
 
 BREW_BIN=""

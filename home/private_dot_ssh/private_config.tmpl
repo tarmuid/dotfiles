@@ -1,13 +1,16 @@
-{{ if .flags.is_work_owned -}}
+{{- $flags := index . "flags" | default dict -}}
+{{- $isWorkOwned := index $flags "is_work_owned" | default false -}}
+{{- $isGuiAllowed := index $flags "is_gui_allowed" | default (eq .chezmoi.os "darwin") -}}
+{{ if $isWorkOwned -}}
 Include ~/.ssh/config-work
 {{- end }}
 
 Host github.com
-  IgnoreUnknown UseKeychain,AddKeysToAgent{{ if and (ne .chezmoi.os "windows") (or (eq .defaults.password_manager "1password") (eq .defaults.password_manager "secretive")) }},IdentityAgent{{ end }}
+  IgnoreUnknown UseKeychain,AddKeysToAgent{{ if and $isGuiAllowed (eq .chezmoi.os "darwin") (or (eq .defaults.password_manager "1password") (eq .defaults.password_manager "secretive")) }},IdentityAgent{{ end }}
   UseKeychain yes
   AddKeysToAgent yes
-{{- if and (ne .chezmoi.os "windows") (eq .defaults.password_manager "1password") }}
+{{- if and $isGuiAllowed (eq .chezmoi.os "darwin") (eq .defaults.password_manager "1password") }}
   IdentityAgent "{{ .chezmoi.homeDir }}/.local/state/1password/agent.sock"
-{{- else if and (ne .chezmoi.os "windows") (eq .defaults.password_manager "secretive") }}
+{{- else if and $isGuiAllowed (eq .chezmoi.os "darwin") (eq .defaults.password_manager "secretive") }}
   IdentityAgent "{{ .chezmoi.homeDir }}/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh"
 {{- end }}

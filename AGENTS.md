@@ -29,16 +29,17 @@ Use chezmoi naming semantics exactly.
 | `.age` | AGE-encrypted source file | `key.txt.age` |
 
 ## 4) Targeting model and template gates
-Templates are selected by a four-tier targeting model:
+Templates are selected by a five-tier targeting model:
 - `ownership`: `personal`, `work_flex`, `work_strict`
 - `profile`: `portable`, `rig`, `server`
+- `deployment`: `desktop`, `vm`, `container`, `headless`
 - `capacities`: `gaming`, `development`, `media`
 - `programs`: selectors for `password_managers`, `terminals`, `editors`, `shells` (plus toolchains)
 
 Template data and gating keys include:
-- `ownership`, `profile`, `capacities`
+- `ownership`, `profile`, `deployment`, `capacities`
 - `programs.*`, `defaults.*`
-- `flags.is_work_owned`
+- `flags.is_work_owned`, `flags.is_headless`, `flags.is_gui_allowed`
 
 Rule: Before editing conditional files, verify how `.chezmoiignore` and templates gate inclusion for personal vs. work-owned targets.
 
@@ -55,8 +56,9 @@ Rule: Before editing conditional files, verify how `.chezmoiignore` and template
   1. `base`
   2. `ownership`
   3. `profiles`
-  4. `capacities`
-  5. program selectors (`password_managers`, `terminals`, `editors`, `shells`, `toolchains`, `browsers`)
+  4. `deployments`
+  5. `capacities`
+  6. program selectors (`password_managers`, `terminals`, `editors`, `shells`, `toolchains`, `browsers`)
 - Theme data lives in `home/.chezmoidata/theme.yaml`.
 
 Rule: Prefer data-layer edits in `packages.yaml` over ad-hoc imperative install logic.
@@ -105,6 +107,7 @@ When proposing/reporting changes, include:
 ## 11) Known gotchas
 - `.chezmoiroot` points to `home/`; files outside `home/` are repo-only and never applied directly to `$HOME`.
 - `.chezmoiignore` conditionally excludes files based on targeting/template data.
+- Non-desktop deployments should default to `flags.is_gui_allowed: false` unless explicitly overridden.
 - Encrypted files require AGE identity workflow; use `chezmoi edit <path>`.
 - `.gitignore` excludes certain unencrypted work files (for example work git/ssh configs and work install scripts); do not assume ignored files are safe for secrets.
 

@@ -1,4 +1,7 @@
-{{ if eq .chezmoi.os "darwin" -}}
+{{- $deployment := index . "deployment" | default "desktop" -}}
+{{- $flags := index . "flags" | default dict -}}
+{{- $isGuiAllowed := index $flags "is_gui_allowed" | default (eq $deployment "desktop") -}}
+{{ if and (eq .chezmoi.os "darwin") (eq $deployment "desktop") $isGuiAllowed -}}
 #!/usr/bin/env zsh
 
 set -Eeuo pipefail

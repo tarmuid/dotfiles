@@ -1,5 +1,9 @@
+{{- $flags := index . "flags" | default dict -}}
+{{- $isGuiAllowed := index $flags "is_gui_allowed" | default (eq .chezmoi.os "darwin") -}}
+{{- $usesSecretive := and $isGuiAllowed (eq .chezmoi.os "darwin") (eq .defaults.password_manager "secretive") -}}
+{{- $uses1Password := and $isGuiAllowed (eq .chezmoi.os "darwin") (eq .defaults.password_manager "1password") -}}
 [user]
-{{- if eq .defaults.password_manager "secretive" }}
+{{- if $usesSecretive }}
   signingkey = key::{{ .signing_key }}
 {{- else }}
   signingkey = {{ .signing_key }}
@@ -8,12 +12,12 @@
 [gpg]
   format = ssh
 
-{{- if eq .defaults.password_manager "secretive" }}
+{{- if $usesSecretive }}
 [gpg "ssh"]
   program = "{{ .chezmoi.homeDir }}/.local/bin/git-ssh-sign-secretive"
 {{- end }}
 
-{{- if eq .defaults.password_manager "1password" }}
+{{- if $uses1Password }}
 [gpg "ssh"]
   program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 {{- end }}

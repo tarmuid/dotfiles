@@ -6,7 +6,6 @@ packages:
         - bat
         - chafa
         - chezmoi
-        - dockutil
         - eza
         - fd
         - ffmpeg
@@ -23,9 +22,7 @@ packages:
         - zellij
         - zimfw
         - zoxide
-      casks:
-        - font-jetbrains-mono-nerd-font
-        - raycast
+      casks: []
 
     ownership:
       personal:
@@ -52,6 +49,27 @@ packages:
         formulae: []
         casks: []
       server:
+        taps: []
+        formulae: []
+        casks: []
+
+    deployments:
+      desktop:
+        taps: []
+        formulae:
+          - dockutil
+        casks:
+          - font-jetbrains-mono-nerd-font
+          - raycast
+      vm:
+        taps: []
+        formulae: []
+        casks: []
+      container:
+        taps: []
+        formulae: []
+        casks: []
+      headless:
         taps: []
         formulae: []
         casks: []
