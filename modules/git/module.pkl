@@ -1,0 +1,14 @@
+moduleName = "git"
+
+files = List(
+  new {
+    tree = "config"
+    source = "config/git/config"
+    target = "git/config"
+  },
+  new {
+    tree = "config"
+    source = "config/git/ignore"
+    target = "git/ignore"
+  }
+)

@@ -1,0 +1,27 @@
+[user]
+  name = tarmuid
+  email = git@tarmuid.io
+
+[init]
+  defaultBranch = main
+
+[pull]
+  ff = only
+
+[push]
+  autoSetupRemote = true
+
+[fetch]
+  prune = true
+
+[rerere]
+  enabled = true
+
+[diff]
+  algorithm = histogram
+
+[color]
+  ui = auto
+
+[core]
+  excludesFile = ~/.config/git/ignore

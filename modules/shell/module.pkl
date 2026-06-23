@@ -1,0 +1,24 @@
+moduleName = "shell"
+
+files = List(
+  new {
+    tree = "home"
+    source = "home/.zshenv"
+    target = ".zshenv"
+  },
+  new {
+    tree = "config"
+    source = "config/zsh/.zshenv"
+    target = "zsh/.zshenv"
+  },
+  new {
+    tree = "config"
+    source = "config/zsh/.zprofile"
+    target = "zsh/.zprofile"
+  },
+  new {
+    tree = "config"
+    source = "config/zsh/.zshrc"
+    target = "zsh/.zshrc"
+  }
+)
