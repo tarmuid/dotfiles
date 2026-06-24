@@ -1,0 +1,5 @@
+moduleName = "cli/starship"
+
+packages {
+  brew = List("starship")
+}
