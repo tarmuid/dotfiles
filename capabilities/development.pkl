@@ -1,1 +1,1 @@
-modules = List("editors/zed")
+modules = List("cli/mise")

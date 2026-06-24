@@ -1,7 +1,6 @@
 modules = List(
   "cli/git",
-  "cli/mise",
-  "harnesses/oh-my-pi",
+  "cli/ssh",
   "shells/zsh",
   "terminals/ghostty",
   "terminals/cmux"
