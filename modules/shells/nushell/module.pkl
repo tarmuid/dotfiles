@@ -1,0 +1,5 @@
+moduleName = "shells/nushell"
+
+packages {
+  brew = List("nushell")
+}
