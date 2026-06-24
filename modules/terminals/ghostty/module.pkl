@@ -1,0 +1,13 @@
+moduleName = "terminals/ghostty"
+
+packages {
+  cask = List("ghostty")
+}
+
+files = List(
+  new {
+    tree = "config"
+    source = "config/ghostty/config.ghostty"
+    target = "ghostty/config.ghostty"
+  }
+)
