@@ -1,15 +1,30 @@
 {
+  "edit_predictions": {
+    "mode": "subtle"
+  },
+  "agent_servers": {
+    "omp": {
+      "favorite_config_option_values": {
+        "model": ["openai-codex/gpt-5.5"],
+        "thinking": ["high"],
+        "mode": ["plan"],
+      },
+      "default_config_options": {
+        "mode": "default",
+      },
+      "type": "custom",
+      "command": "omp",
+      "args": ["acp"],
+      "env": {},
+    },
+  },
+  "use_system_prompts": false,
+  "use_system_path_prompts": false,
   "ui_font_size": 16.0,
   "agent_ui_font_size": 15.0,
   "buffer_font_size": 13.0,
   "theme": "GitHub Dark Dimmed",
   "cli_default_open_behavior": "new_window",
-  "collaboration_panel": {
-    "button": false,
-  },
-  "edit_predictions": {
-    "provider": "none",
-  },
   "git_panel": {
     "file_icons": true,
   },
