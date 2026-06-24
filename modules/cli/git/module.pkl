@@ -1,0 +1,1 @@
+moduleName = "cli/git"

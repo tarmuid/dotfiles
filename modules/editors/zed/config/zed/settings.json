@@ -1,0 +1,23 @@
+{
+  "collaboration_panel": {
+    "button": false
+  },
+  "edit_predictions": {
+    "provider": "none",
+  },
+  "git_panel": {
+    "file_icons": true,
+  },
+  "terminal": {
+    "show_count_badge": false,
+  },
+  "project_panel": {
+    "git_status_indicator": true,
+    "bold_folder_labels": false,
+  },
+  "buffer_font_family": "Berkeley Mono Variable",
+  "telemetry": {
+    "metrics": false,
+  },
+  "vim_mode": true,
+}

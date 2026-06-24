@@ -1,0 +1,5 @@
+moduleName = "harnesses/codex"
+
+packages {
+  brew = List("codex")
+}

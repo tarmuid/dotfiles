@@ -1,0 +1,5 @@
+moduleName = "editors/zed"
+
+packages {
+  cask = List("zed")
+}

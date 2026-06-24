@@ -1,0 +1,5 @@
+moduleName = "cli/mise"
+
+packages {
+  brew = List("mise")
+}
