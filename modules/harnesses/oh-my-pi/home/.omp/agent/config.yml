@@ -2,8 +2,8 @@ providers:
   webSearch: auto
 symbolPreset: nerd
 theme: 
-  dark: dark-nebula
-  light: light-synthwave
+  dark: dark-github
+  light: light-github
 setupVersion: 1
 statusLine: 
   preset: default
@@ -36,9 +36,15 @@ commands:
   enableClaudeProject: false
   enableOpencodeUser: false
   enableOpencodeProject: false
+skills: 
+  enabled: true
+  enableSkillCommands: true
+  enablePiUser: true
 modelRoles: 
   slow: gpt-5.5:xhigh
   default: openai-codex/gpt-5.5:high
   commit: openai-codex/gpt-5.5
 hideThinkingBlock: false
 defaultThinkingLevel: auto
+mnemopi: 
+  proactiveLinking: true
