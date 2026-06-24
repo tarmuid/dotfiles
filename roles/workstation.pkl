@@ -3,5 +3,6 @@ modules = List(
   "cli/mise",
   "harnesses/oh-my-pi",
   "shells/zsh",
-  "terminals/ghostty"
+  "terminals/ghostty",
+  "terminals/cmux"
 )

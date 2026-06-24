@@ -1,0 +1,14 @@
+moduleName = "terminals/cmux"
+
+packages {
+  taps = List("manaflow-ai/cmux")
+  cask = List("cmux")
+}
+
+files = List(
+  new Dynamic {
+    tree = "config"
+    source = "config/cmux/cmux.json"
+    target = "cmux/cmux.json"
+  }
+)
