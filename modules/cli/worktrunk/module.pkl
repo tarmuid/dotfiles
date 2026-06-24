@@ -1,0 +1,5 @@
+moduleName = "cli/worktrunk"
+
+packages {
+  brew = List("worktrunk")
+}

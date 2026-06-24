@@ -10,5 +10,15 @@ files = List(
     tree = "home"
     source = "home/.omp/agent/config.yml"
     target = ".omp/agent/config.yml"
+  },
+  new Dynamic {
+    tree = "home"
+    source = "home/.omp/agent/AGENTS.md"
+    target = ".omp/agent/AGENTS.md"
+  },
+  new Dynamic {
+    tree = "home"
+    source = "home/.omp/agent/skills/worktrunk/SKILL.md"
+    target = ".omp/agent/skills/worktrunk/SKILL.md"
   }
 )

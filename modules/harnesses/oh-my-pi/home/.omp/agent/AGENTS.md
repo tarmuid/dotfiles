@@ -40,6 +40,7 @@ These rules override everything else in this file when in conflict:
   clean.
 - Match existing patterns in the codebase. If the project uses pattern X, use
   pattern X, even if you'd do it differently in a greenfield repo.
+- For a new independent coding task, create or enter a Worktrunk worktree before editing: `wt switch --create <short-kebab-branch>` for new work or `wt switch <branch>` for an existing branch. Do not move an already-active task mid-session unless the user explicitly asks; continue in the current checkout to avoid stranding uncommitted work.
 - Surface assumptions out loud: "I'm assuming you want X, Y, Z. If that's wrong,
   say so." Do not bury assumptions inside the implementation.
 - If two approaches exist, present both with tradeoffs. Do not pick one
