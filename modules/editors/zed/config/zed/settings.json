@@ -1,6 +1,11 @@
 {
+  "ui_font_size": 16.0,
+  "agent_ui_font_size": 15.0,
+  "buffer_font_size": 13.0,
+  "theme": "GitHub Dark Dimmed",
+  "cli_default_open_behavior": "new_window",
   "collaboration_panel": {
-    "button": false
+    "button": false,
   },
   "edit_predictions": {
     "provider": "none",
