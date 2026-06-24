@@ -1,0 +1,44 @@
+providers: 
+  webSearch: auto
+symbolPreset: nerd
+theme: 
+  dark: dark-nebula
+  light: light-synthwave
+setupVersion: 1
+statusLine: 
+  preset: default
+  separator: none
+  sessionAccent: true
+  showHookStatus: true
+tui: 
+  textSizing: false
+  tight: false
+  hyperlinks: auto
+memory: 
+  backend: mnemopi
+vault: 
+  enabled: true
+display: 
+  cacheMissMarker: true
+  shimmer: classic
+proseOnlyThinking: true
+personality: default
+advisor: 
+  enabled: true
+autolearn: 
+  enabled: true
+github: 
+  enabled: true
+plan: 
+  defaultOnStartup: true
+commands: 
+  enableClaudeUser: false
+  enableClaudeProject: false
+  enableOpencodeUser: false
+  enableOpencodeProject: false
+modelRoles: 
+  slow: gpt-5.5:xhigh
+  default: openai-codex/gpt-5.5:high
+  commit: openai-codex/gpt-5.5
+hideThinkingBlock: false
+defaultThinkingLevel: auto

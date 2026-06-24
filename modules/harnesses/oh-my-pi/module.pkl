@@ -1,0 +1,14 @@
+moduleName = "harnesses/oh-my-pi"
+
+packages {
+  taps = List("can1357/tap")
+  brew = List("omp")
+}
+
+files = List(
+  new Dynamic {
+    tree = "home"
+    source = "home/.omp/agent/config.yml"
+    target = ".omp/agent/config.yml"
+  }
+)
