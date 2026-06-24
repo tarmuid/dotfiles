@@ -1,5 +1,5 @@
 moduleName = "harnesses/codex"
 
 packages {
-  brew = List("codex")
+  cask = List("codex")
 }

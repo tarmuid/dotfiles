@@ -5,7 +5,7 @@ packages {
 }
 
 files = List(
-  new {
+  new Dynamic {
     tree = "config"
     source = "config/ghostty/config.ghostty"
     target = "ghostty/config.ghostty"
