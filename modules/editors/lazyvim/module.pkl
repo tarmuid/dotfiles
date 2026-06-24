@@ -1,0 +1,68 @@
+moduleName = "editors/lazyvim"
+
+packages {
+  brew = List("neovim")
+}
+
+files = List(
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/init.lua"
+    target = "nvim/init.lua"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/lazyvim.json"
+    target = "nvim/lazyvim.json"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/lazy-lock.json"
+    target = "nvim/lazy-lock.json"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/stylua.toml"
+    target = "nvim/stylua.toml"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/.neoconf.json"
+    target = "nvim/.neoconf.json"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/lua/config/lazy.lua"
+    target = "nvim/lua/config/lazy.lua"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/lua/config/options.lua"
+    target = "nvim/lua/config/options.lua"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/lua/config/keymaps.lua"
+    target = "nvim/lua/config/keymaps.lua"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/lua/config/autocmds.lua"
+    target = "nvim/lua/config/autocmds.lua"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/lua/plugins/init.lua"
+    target = "nvim/lua/plugins/init.lua"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/lua/plugins/conform.lua"
+    target = "nvim/lua/plugins/conform.lua"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/lua/plugins/github.lua"
+    target = "nvim/lua/plugins/github.lua"
+  }
+)
