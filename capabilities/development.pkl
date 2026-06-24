@@ -1,1 +1,4 @@
-modules = List("cli/mise")
+modules = List(
+  "cli/mise",
+  "toolchains/apple"
+)

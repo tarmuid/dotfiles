@@ -1,0 +1,13 @@
+moduleName = "toolchains/apple"
+
+packages {
+  brew = List(
+    "xcodes",
+    "xcode-build-server",
+    "swiftlint",
+    "swiftformat",
+    "clang-format",
+    "xcbeautify",
+    "xcodegen"
+  )
+}
