@@ -1,0 +1,13 @@
+moduleName = "cli/dprint"
+
+packages {
+  brew = List("dprint")
+}
+
+files = List(
+  new Dynamic {
+    tree = "home"
+    source = "home/.config/dprint/dprint.jsonc"
+    target = ".config/dprint/dprint.jsonc"
+  }
+)

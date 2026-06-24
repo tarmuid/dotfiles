@@ -1,5 +1,6 @@
 modules = List(
   "cli/mise",
   "cli/worktrunk",
+  "cli/dprint",
   "toolchains/apple"
 )
