@@ -1,1 +1,8 @@
 moduleName = "shells/zsh"
+
+packages {
+  brew = List(
+    "zimfw",
+    "fzf"
+  )
+}
