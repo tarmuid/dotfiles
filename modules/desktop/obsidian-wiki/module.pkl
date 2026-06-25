@@ -1,0 +1,19 @@
+moduleName = "desktop/obsidian-wiki"
+
+files = List(
+  new Dynamic {
+    tree = "home"
+    source = "home/.local/share/wiki/.obsidian/app.json"
+    target = ".local/share/wiki/.obsidian/app.json"
+  },
+  new Dynamic {
+    tree = "home"
+    source = "home/.local/share/wiki/.obsidian/appearance.json"
+    target = ".local/share/wiki/.obsidian/appearance.json"
+  },
+  new Dynamic {
+    tree = "home"
+    source = "home/.local/share/wiki/.obsidian/core-plugins.json"
+    target = ".local/share/wiki/.obsidian/core-plugins.json"
+  }
+)

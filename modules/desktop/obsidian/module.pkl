@@ -1,0 +1,5 @@
+moduleName = "desktop/obsidian"
+
+packages {
+  cask = List("obsidian")
+}

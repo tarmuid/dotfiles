@@ -5,5 +5,6 @@ modules = List(
   "shells/zsh",
   "shells/nushell",
   "terminals/ghostty",
-  "terminals/cmux"
+  "terminals/cmux",
+  "desktop/obsidian"
 )
