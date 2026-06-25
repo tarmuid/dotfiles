@@ -1,0 +1,9 @@
+modules = List(
+  "cli/git",
+  "cli/ssh",
+  "cli/starship",
+  "cli/mise",
+  "cli/obsidian-headless",
+  "shells/zsh",
+  "shells/nushell"
+)
