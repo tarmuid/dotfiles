@@ -1,0 +1,9 @@
+moduleName = "cli/lazygit"
+
+files = List(
+  new {
+    tree = "config"
+    source = "config/lazygit/config.yml"
+    target = "lazygit/config.yml"
+  }
+)
