@@ -20,7 +20,7 @@ if ($env.XDG_DATA_DIRS? | is-empty) {
   $env.XDG_DATA_DIRS = ($dirs | str join (char esep))
 }
 
-if ($env.EDITOR? | is-empty) { $env.EDITOR = "vi" }
+if ($env.EDITOR? | is-empty) { $env.EDITOR = "nvim" }
 if ($env.PAGER? | is-empty) { $env.PAGER = "less" }
 
 $env.ENV_CONVERSIONS = ($env.ENV_CONVERSIONS | merge {

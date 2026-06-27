@@ -28,7 +28,7 @@ if [[ -z "${XDG_DATA_DIRS:-}" ]]; then
 fi
 
 
-export EDITOR="${EDITOR:-vi}"
+export EDITOR="${EDITOR:-nvim}"
 export PAGER="${PAGER:-less}"
 
 export HOMEBREW_NO_ENV_HINTS=1
