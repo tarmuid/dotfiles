@@ -1,0 +1,8 @@
+if_missing = "error"
+
+[providers]
+keychain = { type = "keychain", service = "openclaw" }
+
+[secrets]
+OPENCLAW_GATEWAY_TOKEN= { provider = "keychain", value = "gateway-auth-token", description = "OpenClaw gateway auth token", if_missing = "error" }
+OPENCLAW_TELEGRAM_BOT_TOKEN= { provider = "keychain", value = "telegram-bot-token", description = "OpenClaw Telegram bot token", if_missing = "error" }

@@ -1,0 +1,26 @@
+moduleName = "harnesses/openclaw"
+
+packages {
+  mise = List(
+    "fnox",
+    "node@22"
+  )
+}
+
+files = List(
+  new Dynamic {
+    tree = "home"
+    source = "home/.openclaw/fnox.toml"
+    target = ".openclaw/fnox.toml"
+  },
+  new Dynamic {
+    tree = "home"
+    source = "home/.openclaw/bin/openclaw-fnox-resolver.mjs"
+    target = ".openclaw/bin/openclaw-fnox-resolver.mjs"
+  },
+  new Dynamic {
+    tree = "home"
+    source = "home/.openclaw/openclaw.json"
+    target = ".openclaw/openclaw.json"
+  }
+)

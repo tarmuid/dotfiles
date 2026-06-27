@@ -1,5 +1,6 @@
 modules = List(
   "harnesses/codex",
   "harnesses/oh-my-pi",
+  "harnesses/openclaw",
   "harnesses/opencode"
 )

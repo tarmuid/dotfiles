@@ -1,0 +1,296 @@
+{
+  "gateway": {
+    "auth": {
+      "mode": "token",
+      "token": {
+        "source": "exec",
+        "provider": "fnox",
+        "id": "OPENCLAW_GATEWAY_TOKEN"
+      }
+    },
+    "mode": "local"
+  },
+  "secrets": {
+    "providers": {
+      "fnox": {
+        "source": "exec",
+        "command": "/Users/admin/.openclaw/bin/openclaw-fnox-resolver.mjs",
+        "allowSymlinkCommand": true,
+        "trustedDirs": [
+          "/Users/admin/.openclaw/bin",
+          "/Users/admin/.local/share/blueprint/modules/harnesses/openclaw/home/.openclaw/bin"
+        ],
+        "passEnv": [
+          "HOME",
+          "PATH"
+        ],
+        "jsonOnly": true
+      }
+    },
+    "defaults": {
+      "exec": "fnox"
+    }
+  },
+  "skills": {
+    "entries": {
+      "apple-notes": {
+        "enabled": false
+      },
+      "apple-reminders": {
+        "enabled": false
+      },
+      "bear-notes": {
+        "enabled": false
+      },
+      "blucli": {
+        "enabled": false
+      },
+      "camsnap": {
+        "enabled": false
+      },
+      "clawhub": {
+        "enabled": false
+      },
+      "coding-agent": {
+        "enabled": false
+      },
+      "discord": {
+        "enabled": false
+      },
+      "eightctl": {
+        "enabled": false
+      },
+      "gemini": {
+        "enabled": false
+      },
+      "gifgrep": {
+        "enabled": false
+      },
+      "gog": {
+        "enabled": false
+      },
+      "goplaces": {
+        "enabled": false
+      },
+      "himalaya": {
+        "enabled": false
+      },
+      "imsg": {
+        "enabled": false
+      },
+      "mcporter": {
+        "enabled": false
+      },
+      "model-usage": {
+        "enabled": false
+      },
+      "nano-pdf": {
+        "enabled": false
+      },
+      "openai-whisper": {
+        "enabled": false
+      },
+      "openai-whisper-api": {
+        "enabled": false
+      },
+      "openhue": {
+        "enabled": false
+      },
+      "oracle": {
+        "enabled": false
+      },
+      "ordercli": {
+        "enabled": false
+      },
+      "peekaboo": {
+        "enabled": false
+      },
+      "sag": {
+        "enabled": false
+      },
+      "sherpa-onnx-tts": {
+        "enabled": false
+      },
+      "slack": {
+        "enabled": false
+      },
+      "songsee": {
+        "enabled": false
+      },
+      "sonoscli": {
+        "enabled": false
+      },
+      "spotify-player": {
+        "enabled": false
+      },
+      "summarize": {
+        "enabled": false
+      },
+      "things-mac": {
+        "enabled": false
+      },
+      "tmux": {
+        "enabled": false
+      },
+      "trello": {
+        "enabled": false
+      },
+      "voice-call": {
+        "enabled": false
+      },
+      "wacli": {
+        "enabled": false
+      },
+      "xurl": {
+        "enabled": false
+      },
+      "1password": {
+        "enabled": false
+      },
+      "notion": {
+        "enabled": false
+      }
+    }
+  },
+  "wizard": {
+    "lastRunAt": "2026-06-27T17:40:17.353Z",
+    "lastRunVersion": "2026.6.10",
+    "lastRunCommand": "doctor",
+    "lastRunMode": "local"
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.6.10",
+    "lastTouchedAt": "2026-06-27T18:10:56.941Z"
+  },
+  "plugins": {
+    "entries": {
+      "memory-core": {
+        "config": {
+          "dreaming": {
+            "enabled": true
+          }
+        },
+        "enabled": true
+      },
+      "memory-wiki": {
+        "enabled": true,
+        "config": {
+          "vaultMode": "bridge",
+          "vault": {
+            "path": "~/.local/share/wiki",
+            "renderMode": "obsidian"
+          },
+          "bridge": {
+            "enabled": true,
+            "readMemoryArtifacts": true,
+            "indexDreamReports": true,
+            "indexDailyNotes": true,
+            "indexMemoryRoot": true,
+            "followMemoryEvents": true
+          },
+          "search": {
+            "backend": "shared",
+            "corpus": "all"
+          },
+          "obsidian": {
+            "useOfficialCli": true
+          },
+          "unsafeLocal": {
+            "allowPrivateMemoryCoreAccess": true
+          },
+          "context": {
+            "includeCompiledDigestPrompt": false
+          }
+        }
+      },
+      "workboard": {
+        "enabled": true
+      },
+      "openai": {
+        "enabled": true
+      },
+      "codex": {
+        "enabled": true
+      },
+      "telegram": {
+        "enabled": true
+      },
+      "llama-cpp": {
+        "enabled": true
+      },
+      "tokenjuice": {
+        "enabled": true
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "/Users/admin/.openclaw/workspace",
+      "models": {
+        "openai/gpt-5.5": {}
+      },
+      "model": {
+        "primary": "openai/gpt-5.5"
+      },
+      "memorySearch": {
+        "provider": "local",
+        "fallback": "none",
+        "local": {
+          "modelPath": "hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/embeddinggemma-300m-qat-Q8_0.gguf",
+          "modelCacheDir": "/Users/admin/.openclaw/models/llama-cpp",
+          "contextSize": 4096
+        },
+        "sync": {
+          "embeddingBatchTimeoutSeconds": 600
+        }
+      }
+    }
+  },
+  "auth": {
+    "profiles": {
+      "openai:oai@tarmuid.io": {
+        "provider": "openai",
+        "mode": "oauth",
+        "email": "oai@tarmuid.io"
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "dmPolicy": "pairing",
+      "enabled": true,
+      "botToken": {
+        "source": "exec",
+        "provider": "fnox",
+        "id": "OPENCLAW_TELEGRAM_BOT_TOKEN"
+      },
+      "richMessages": true,
+      "reactionLevel": "ack",
+      "streaming": {
+        "mode": "partial",
+        "progress": {
+          "render": "rich"
+        }
+      },
+      "groupPolicy": "disabled"
+    }
+  },
+  "commitments": {
+    "enabled": true,
+    "maxPerDay": 3
+  },
+  "memory": {
+    "backend": "qmd",
+    "qmd": {
+      "sessions": {
+        "enabled": true
+      },
+      "command": "/Users/admin/.openclaw/bin/qmd-no-ci",
+      "searchMode": "query",
+      "rerank": false,
+      "limits": {
+        "timeoutMs": 120000
+      }
+    }
+  }
+}
