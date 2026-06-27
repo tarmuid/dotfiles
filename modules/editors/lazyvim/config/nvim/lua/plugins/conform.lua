@@ -5,6 +5,9 @@ return {
       formatters_by_ft = {
         json = { "dprint" },
         jsonc = { "dprint" },
+        swift = { "swiftformat" },
+        objc = { "clang-format" },
+        objcpp = { "clang-format" },
       },
       formatters = {
         dprint = {

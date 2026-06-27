@@ -62,6 +62,11 @@ files = List(
   },
   new Dynamic {
     tree = "config"
+    source = "config/nvim/lua/plugins/apple.lua"
+    target = "nvim/lua/plugins/apple.lua"
+  },
+  new Dynamic {
+    tree = "config"
     source = "config/nvim/lua/plugins/github.lua"
     target = "nvim/lua/plugins/github.lua"
   }
