@@ -1,6 +1,7 @@
 {
+  "proxy": "",
   "edit_predictions": {
-    "mode": "subtle"
+    "mode": "subtle",
   },
   "agent_servers": {
     "omp": {
@@ -9,13 +10,27 @@
         "thinking": ["high"],
         "mode": ["plan"],
       },
-      "default_config_options": {
-        "mode": "default",
-      },
       "type": "custom",
       "command": "omp",
       "args": ["acp"],
       "env": {},
+    },
+  },
+  "languages": {
+    "Markdown": {
+      "formatter": {
+        "external": {
+          "command": "dprint",
+          "arguments": [
+            "fmt",
+            "--stdin",
+            "{buffer_path}",
+            "--config-discovery=global",
+          ],
+        },
+      },
+      "format_on_save": "on",
+      "preferred_line_length": 80,
     },
   },
   "use_system_prompts": false,

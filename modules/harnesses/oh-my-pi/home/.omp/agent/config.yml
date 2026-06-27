@@ -36,7 +36,7 @@ commands:
   enableClaudeProject: false
   enableOpencodeUser: false
   enableOpencodeProject: false
-skills:
+skills: 
   enabled: true
   enableSkillCommands: true
   enablePiUser: true
@@ -48,3 +48,8 @@ hideThinkingBlock: false
 defaultThinkingLevel: auto
 mnemopi: 
   proactiveLinking: true
+bash: 
+  autoBackground: 
+    enabled: true
+bashInterceptor: 
+  enabled: true

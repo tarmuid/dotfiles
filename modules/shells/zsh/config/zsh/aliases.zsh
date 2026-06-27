@@ -6,3 +6,4 @@ alias la='ls -A'
 alias ll='ls -lh'
 
 alias gg='lazygit'
+alias e='nvim'

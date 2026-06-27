@@ -7,3 +7,7 @@
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
 [[ -r "$ZDOTDIR/starship.zsh" ]] && source "$ZDOTDIR/starship.zsh"
+
+if command -v "mise" >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi

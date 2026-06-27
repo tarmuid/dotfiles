@@ -30,3 +30,8 @@ fi
 
 export EDITOR="${EDITOR:-vi}"
 export PAGER="${PAGER:-less}"
+
+export HOMEBREW_NO_ENV_HINTS=1
+
+export BLUEPRINT_DIR="$XDG_DATA_HOME/blueprint"
+export LLM_WIKI_DIR="$XDG_DATA_HOME/wiki"
