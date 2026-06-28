@@ -1,3 +1,8 @@
 {
-  "theme": "system"
+  "theme": "system",
+  "interfaceFontFamily": "Inter",
+  "cssTheme": "Minimal",
+  "accentColor": "#c255d8",
+  "monospaceFontFamily": "Berkeley Mono Variable",
+  "textFontFamily": "Inter"
 }

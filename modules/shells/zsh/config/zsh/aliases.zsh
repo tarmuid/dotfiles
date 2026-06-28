@@ -7,3 +7,5 @@ alias ll='ls -lh'
 
 alias gg='lazygit'
 alias e='nvim'
+
+alias cdd="cd $BLUEPRINT_DIR"
