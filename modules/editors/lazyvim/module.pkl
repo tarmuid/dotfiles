@@ -32,6 +32,11 @@ files = List(
   },
   new Dynamic {
     tree = "config"
+    source = "config/nvim/.markdownlint.json"
+    target = "nvim/.markdownlint.json"
+  },
+  new Dynamic {
+    tree = "config"
     source = "config/nvim/lua/config/lazy.lua"
     target = "nvim/lua/config/lazy.lua"
   },
@@ -54,6 +59,11 @@ files = List(
     tree = "config"
     source = "config/nvim/lua/plugins/init.lua"
     target = "nvim/lua/plugins/init.lua"
+  },
+  new Dynamic {
+    tree = "config"
+    source = "config/nvim/lua/plugins/lint.lua"
+    target = "nvim/lua/plugins/lint.lua"
   },
   new Dynamic {
     tree = "config"
