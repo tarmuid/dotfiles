@@ -1,0 +1,8 @@
+moduleName = "toolchains/python"
+
+packages {
+  mise = List(
+    "python@3",
+    "uv"
+  )
+}

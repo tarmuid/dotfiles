@@ -3,6 +3,7 @@ modules = List(
   "cli/ssh",
   "cli/starship",
   "cli/mise",
+  "toolchains/javascript",
   "cli/obsidian-headless",
   "shells/zsh",
   "shells/nushell"

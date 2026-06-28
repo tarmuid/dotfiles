@@ -2,7 +2,6 @@ moduleName = "cli/obsidian-headless"
 
 packages {
   mise = List(
-    "node@22",
     "npm:obsidian-headless@0.0.12"
   )
 }

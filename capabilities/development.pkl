@@ -2,5 +2,9 @@ modules = List(
   "cli/mise",
   "cli/worktrunk",
   "cli/dprint",
+  "toolchains/javascript",
+  "toolchains/python",
+  "toolchains/go",
+  "toolchains/rust",
   "toolchains/apple"
 )

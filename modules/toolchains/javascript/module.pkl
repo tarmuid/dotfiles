@@ -1,0 +1,9 @@
+moduleName = "toolchains/javascript"
+
+packages {
+  mise = List(
+    "node@22",
+    "bun",
+    "pnpm"
+  )
+}

@@ -33,3 +33,12 @@ $env.ENV_CONVERSIONS = ($env.ENV_CONVERSIONS | merge {
     to_string: {|v| $v | path expand --no-symlink | str join (char esep) }
   }
 })
+
+const config_dir = ($nu.env-path | path dirname)
+const javascript_config = if (($config_dir | path join "config.d" "javascript.nu") | path exists) { ($config_dir | path join "config.d" "javascript.nu") } else { null }
+const go_config = if (($config_dir | path join "config.d" "go.nu") | path exists) { ($config_dir | path join "config.d" "go.nu") } else { null }
+const rust_config = if (($config_dir | path join "config.d" "rust.nu") | path exists) { ($config_dir | path join "config.d" "rust.nu") } else { null }
+
+source $javascript_config
+source $go_config
+source $rust_config

@@ -1,0 +1,5 @@
+moduleName = "toolchains/rust"
+
+packages {
+  mise = List("rust")
+}

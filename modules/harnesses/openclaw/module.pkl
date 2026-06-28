@@ -2,8 +2,7 @@ moduleName = "harnesses/openclaw"
 
 packages {
   mise = List(
-    "fnox",
-    "node@22"
+    "fnox"
   )
 }
 

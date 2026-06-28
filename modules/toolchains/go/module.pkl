@@ -1,0 +1,5 @@
+moduleName = "toolchains/go"
+
+packages {
+  mise = List("go@1")
+}
