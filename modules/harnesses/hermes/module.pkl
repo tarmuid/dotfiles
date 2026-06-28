@@ -5,5 +5,9 @@ files = List(
     tree = "home"
     source = "home/.hermes/config.yaml"
     target = ".hermes/config.yaml"
-  }
-)
+  },
+  new Dynamic {
+    tree = "home"
+    source = "home/.hermes/SOUL.md"
+    target = ".hermes/SOUL.md"
+  })
