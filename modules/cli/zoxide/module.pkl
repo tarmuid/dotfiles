@@ -1,0 +1,5 @@
+moduleName = "cli/zoxide"
+
+packages {
+  brew = List("zoxide")
+}

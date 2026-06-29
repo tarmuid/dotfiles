@@ -2,6 +2,7 @@ modules = List(
   "cli/git",
   "cli/ssh",
   "cli/starship",
+  "cli/zoxide",
   "shells/zsh",
   "shells/nushell",
   "terminals/ghostty",
