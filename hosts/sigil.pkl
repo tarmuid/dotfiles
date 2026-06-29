@@ -1,3 +1,4 @@
 role = "workstation"
 ownership = "personal"
 capabilities = List("development", "harnesses", "agents", "zed", "lazyvim", "obsidian-wiki")
+modules = List("macos/defaults")

@@ -1,0 +1,313 @@
+moduleName = "macos/defaults"
+
+macos {
+  defaults = List(
+    new Dynamic {
+      domain = "dock"
+      key = "autohide"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "autohide-delay"
+      value = "0.0"
+      valueType = "float"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "autohide-time-modifier"
+      value = "0.0"
+      valueType = "float"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "expose-animation-duration"
+      value = "0.1"
+      valueType = "float"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "launchanim"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "magnification"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "mineffect"
+      value = "scale"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "minimize-to-application"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "mouse-over-hilite-stack"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "mru-spaces"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "show-process-indicators"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "show-recents"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "showhidden"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "dock"
+      key = "tilesize"
+      value = "36"
+      valueType = "int"
+    },
+    new Dynamic {
+      domain = "finder"
+      key = "AppleShowAllExtensions"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "finder"
+      key = "AppleShowAllFiles"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "finder"
+      key = "FXDefaultSearchScope"
+      value = "SCcf"
+    },
+    new Dynamic {
+      domain = "finder"
+      key = "FXEnableExtensionChangeWarning"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "finder"
+      key = "FXPreferredViewStyle"
+      value = "Nlsv"
+    },
+    new Dynamic {
+      domain = "finder"
+      key = "QuitMenuItem"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "finder"
+      key = "ShowPathbar"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "finder"
+      key = "ShowStatusBar"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "finder"
+      key = "_FXSortFoldersFirst"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "AppleKeyboardUIMode"
+      value = "3"
+      valueType = "int"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "ApplePressAndHoldEnabled"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "AppleShowAllExtensions"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "InitialKeyRepeat"
+      value = "10"
+      valueType = "int"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "KeyRepeat"
+      value = "1"
+      valueType = "int"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "NSAutomaticCapitalizationEnabled"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "NSAutomaticDashSubstitutionEnabled"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "NSAutomaticPeriodSubstitutionEnabled"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "NSAutomaticQuoteSubstitutionEnabled"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "NSAutomaticSpellingCorrectionEnabled"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "NSDocumentSaveNewDocumentsToCloud"
+      value = "false"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "NSNavPanelExpandedStateForSaveMode"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "NSNavPanelExpandedStateForSaveMode2"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "NSWindowResizeTime"
+      value = "0.001"
+      valueType = "float"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "PMPrintingExpandedStateForPrint"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "PMPrintingExpandedStateForPrint2"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "com.apple.springing.delay"
+      value = "0.0"
+      valueType = "float"
+    },
+    new Dynamic {
+      domain = "global"
+      key = "com.apple.springing.enabled"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "screencapture"
+      key = "disable-shadow"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "screencapture"
+      key = "type"
+      value = "png"
+    },
+    new Dynamic {
+      domain = "com.apple.ActivityMonitor"
+      key = "OpenMainWindow"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "com.apple.ActivityMonitor"
+      key = "ShowCategory"
+      value = "0"
+      valueType = "int"
+    },
+    new Dynamic {
+      domain = "com.apple.ActivityMonitor"
+      key = "SortColumn"
+      value = "CPUUsage"
+    },
+    new Dynamic {
+      domain = "com.apple.ActivityMonitor"
+      key = "SortDirection"
+      value = "0"
+      valueType = "int"
+    },
+    new Dynamic {
+      domain = "com.apple.ImageCapture"
+      key = "disableHotPlug"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "com.apple.desktopservices"
+      key = "DSDontWriteNetworkStores"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "com.apple.desktopservices"
+      key = "DSDontWriteUSBStores"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "com.apple.dock"
+      key = "size-immutable"
+      value = "true"
+      valueType = "bool"
+    },
+    new Dynamic {
+      domain = "com.apple.print.PrintingPrefs"
+      key = "Quit When Finished"
+      value = "true"
+      valueType = "bool"
+    }
+  )
+}
