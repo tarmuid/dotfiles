@@ -1,0 +1,9 @@
+default_provider = "keychain"
+
+[providers.keychain]
+type = "keychain"
+service = "keychain"
+
+[secrets]
+OPENCLAW_GATEWAY_TOKEN= { provider = "keychain", value = "OPENCLAW_GATEWAY_TOKEN" }
+OPENCLAW_TELEGRAM_BOT_TOKEN= { provider = "keychain", value = "OPENCLAW_TELEGRAM_BOT_TOKEN" }

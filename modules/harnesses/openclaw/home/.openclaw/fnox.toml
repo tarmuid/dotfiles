@@ -1,5 +1,9 @@
 if_missing = "error"
 
+[daemon]
+enabled = true
+idle_timeout = "8h"
+
 [providers]
 keychain = { type = "keychain", service = "openclaw" }
 

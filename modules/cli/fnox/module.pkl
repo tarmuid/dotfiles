@@ -1,0 +1,9 @@
+moduleName = "cli/fnox"
+
+files = List(
+  new {
+    tree = "config"
+    source = "config/fnox/config.toml"
+    target = "fnox/config.toml"
+  }
+)
