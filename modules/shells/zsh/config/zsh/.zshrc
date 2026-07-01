@@ -2,6 +2,7 @@
 [[ -r "$ZDOTDIR/functions.zsh" ]] && source "$ZDOTDIR/functions.zsh"
 [[ -r "$ZDOTDIR/aliases.zsh" ]] && source "$ZDOTDIR/aliases.zsh"
 [[ -r "$ZDOTDIR/zimfw.zsh" ]] && source "$ZDOTDIR/zimfw.zsh"
+[[ -r "$ZDOTDIR/atuin.zsh" ]] && source "$ZDOTDIR/atuin.zsh"
 [[ -r "$ZDOTDIR/keybinds.zsh" ]] && source "$ZDOTDIR/keybinds.zsh"
 [[ -r "$ZDOTDIR/ssh.zsh" ]] && source "$ZDOTDIR/ssh.zsh"
 

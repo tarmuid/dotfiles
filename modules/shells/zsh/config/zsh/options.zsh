@@ -1,6 +1,7 @@
 HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 HISTSIZE=100000
 SAVEHIST=100000
+KEYTIMEOUT=10
 
 mkdir -p "${HISTFILE:h}"
 

@@ -1,0 +1,13 @@
+moduleName = "cli/atuin"
+
+packages {
+  brew = List("atuin")
+}
+
+files = List(
+  new Dynamic {
+    tree = "config"
+    source = "config/zsh/atuin.zsh"
+    target = "zsh/atuin.zsh"
+  }
+)
